@@ -1,6 +1,6 @@
 {
   "title": "THYD Explorer",
-  "server": "http://127.0.0.1:4703/api",
+  "server": "http://192.168.0.15:4703/api",
   "alias": "Test",
   "activeDelegates": 53,
   "rewardOffset": 7200,

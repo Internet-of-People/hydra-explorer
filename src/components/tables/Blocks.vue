@@ -38,7 +38,7 @@
           <span
             v-tooltip="{
               trigger: 'hover',
-              content: readableCurrency(data.row.forged.total, data.row.price),
+              content: readableCurrency(data.row.forged.total, data.row.price, 'HYD'),
             }"
             class="whitespace-no-wrap"
           >
@@ -50,7 +50,7 @@
           <span
             v-tooltip="{
               trigger: 'hover',
-              content: data.row.forged.fee ? readableCurrency(data.row.forged.fee, data.row.price) : '',
+              content: data.row.forged.fee ? readableCurrency(data.row.forged.fee, data.row.price, 'HYD') : '',
             }"
             class="whitespace-no-wrap"
           >
@@ -65,7 +65,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { IBlock, ISortParameters } from "@/interfaces";
-//import CryptoCompareService from "@/services/crypto-compare";
+// import CryptoCompareService from "@/services/crypto-compare";
 import { mapGetters } from "vuex";
 
 @Component({
@@ -163,7 +163,7 @@ export default class TableBlocksDesktop extends Vue {
   }
 
   private async fetchPrice(block: IBlock) {
-    //block.price = await CryptoCompareService.dailyAverage(block.timestamp.unix);
+    // block.price = await CryptoCompareService.dailyAverage(block.timestamp.unix);
   }
 
   private async updatePrices() {

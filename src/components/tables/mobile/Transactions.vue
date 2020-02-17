@@ -30,12 +30,21 @@
             {{ $t("TRANSACTION.RECIPIENT") }}
           </div>
           <LinkWallet
+            v-if="!isMorpheusTransaction(transaction.type, transaction.typeGroup)"
             :address="transaction.recipient"
             :type="transaction.type"
             :asset="transaction.asset"
             :type-group="transaction.typeGroup"
             :show-timelock-icon="true"
           />
+          <div v-else v-tooltip="`${MorpheusTxStatus[morpheusTxProvider.get(transaction.id)]}`">
+            Morpheus Transaction
+            <strong>
+              <span style="color:green;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED">&#8226;</span>
+              <span style="color:red;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED">&#8226;</span>
+              <span style="color:orange;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND">&#8226;</span>
+            </strong>
+          </div>
         </div>
 
         <div v-if="truncate(transaction.vendorField || '')" class="list-row-border-b-no-wrap">
@@ -98,13 +107,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { ITransaction, IDelegate } from "@/interfaces";
 import { mapGetters } from "vuex";
+import { isMorpheusTransaction } from "@/morpheus/utils";
+import { morpheusTxProvider } from "@/morpheus/tx-status";
+import { MorpheusTxStatus } from "@/morpheus/api";
 
 @Component({
   computed: {
     ...mapGetters("network", ["activeDelegates"]),
+  },
+  data: () => {
+    return { isMorpheusTransaction, morpheusTxProvider, MorpheusTxStatus };
   },
 })
 export default class TableTransactionsMobile extends Vue {
@@ -118,6 +133,31 @@ export default class TableTransactionsMobile extends Vue {
   @Prop({ required: false, default: false }) public showConfirmations: boolean;
 
   private activeDelegates: IDelegate[];
+
+  @Watch("transactions")
+  public async onTransactionsChanged() {
+    await this.updateMorpheusTxStatuses();
+  }
+
+  public async created() {
+    await this.updateMorpheusTxStatuses();
+  }
+
+  private async updateMorpheusTxStatuses(): Promise<void> {
+    if(!this.transactions) {
+      return;
+    }
+    const morpheusTxs = [];
+    for(const tx of this.transactions) {
+      if(!isMorpheusTransaction(tx.type, tx.typeGroup)) {
+        continue;
+      }
+
+      morpheusTxs.push(tx.id);
+    }
+
+    await morpheusTxProvider.load(morpheusTxs);
+  }
 }
 </script>
 

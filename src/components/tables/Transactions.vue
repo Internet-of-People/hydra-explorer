@@ -28,12 +28,21 @@
 
         <div v-else-if="data.column.field === 'recipient'">
           <LinkWallet
+            v-if="!isMorpheusTransaction(data.row.type, data.row.typeGroup)"
             :address="data.row.recipient"
             :type="data.row.type"
             :asset="data.row.asset"
             :type-group="data.row.typeGroup"
             :show-timelock-icon="true"
           />
+          <div v-else v-tooltip="`${MorpheusTxStatus[morpheusTxProvider.get(data.row.id)]}`">
+            Morpheus Transaction
+            <strong>
+              <span style="color:green;" v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.CONFIRMED">&#8226;</span>
+              <span style="color:red;" v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.REJECTED">&#8226;</span>
+              <span style="color:orange;" v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.NOT_FOUND">&#8226;</span>
+            </strong>
+          </div>
         </div>
 
         <div v-else-if="data.column.field === 'vendorField'">
@@ -75,12 +84,19 @@
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { mapGetters } from "vuex";
 import { IDelegate, ISortParameters, ITransaction } from "@/interfaces";
-//import CryptoCompareService from "@/services/crypto-compare";
+// import CryptoCompareService from "@/services/crypto-compare";
+import { IMorpheusAsset, OperationType, ISignedOperationsData } from "@/morpheus/interfaces";
+import { isMorpheusTransaction } from "@/morpheus/utils";
+import { morpheusTxProvider } from "@/morpheus/tx-status";
+import { MorpheusTxStatus } from "@/morpheus/api";
 
 @Component({
   computed: {
     ...mapGetters("network", ["activeDelegates", "isListed"]),
     ...mapGetters("currency", { currencySymbol: "symbol" }),
+  },
+  data: () => {
+    return { isMorpheusTransaction, morpheusTxProvider, MorpheusTxStatus };
   },
 })
 export default class TableTransactionsDesktop extends Vue {
@@ -174,6 +190,7 @@ export default class TableTransactionsDesktop extends Vue {
   @Watch("transactions")
   public async onTransactionsChanged() {
     await this.prepareTransactions();
+    await this.updateMorpheusTxStatuses();
   }
 
   @Watch("currencySymbol")
@@ -183,6 +200,23 @@ export default class TableTransactionsDesktop extends Vue {
 
   public async created() {
     this.prepareTransactions();
+    await this.updateMorpheusTxStatuses();
+  }
+
+  private async updateMorpheusTxStatuses(): Promise<void> {
+    if(!this.transactions) {
+      return;
+    }
+    const morpheusTxs = [];
+    for(const tx of this.transactions) {
+      if(!isMorpheusTransaction(tx.type, tx.typeGroup)) {
+        continue;
+      }
+
+      morpheusTxs.push(tx.id);
+    }
+
+    await morpheusTxProvider.load(morpheusTxs);
   }
 
   private async prepareTransactions() {
@@ -190,7 +224,7 @@ export default class TableTransactionsDesktop extends Vue {
   }
 
   private async fetchPrice(transaction: ITransaction) {
-    //transaction.price = await CryptoCompareService.dailyAverage(transaction.timestamp.unix);
+    // transaction.price = await CryptoCompareService.dailyAverage(transaction.timestamp.unix);
   }
 
   private async updatePrices() {

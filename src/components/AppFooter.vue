@@ -8,7 +8,7 @@
       <div class="block md:inline-block">
         <span class="hidden md:inline-block">&nbsp;|&nbsp;</span>
         <span
-          >{{ $t("FOOTER.VERSION") }}: <a :href="versionLink" target="_blank">{{ version }}</a> |
+          ><!--{{ $t("FOOTER.VERSION") }}: <a :href="versionLink" target="_blank">{{ version }}</a> |-->
           {{ $t("FOOTER.DATE") }}: {{ date }}</span
         >
       </div>

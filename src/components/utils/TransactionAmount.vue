@@ -18,7 +18,7 @@
       }"
       class="ml-auto"
     >
-      {{ readableCrypto(source, true, 0) }}
+      {{ readableCrypto(source, true, 2) }}
     </span>
     <SvgIcon
       v-if="showAmountInformation"

@@ -2,6 +2,24 @@
   <div>
     <section class="page-section py-5 md:py-10 mb-5">
       <div class="px-5 sm:px-10">
+        <div class="list-row-border-b" v-if="isMorpheusTransaction(transaction.type, transaction.typeGroup)">
+          <div class="mr-4">
+            Morpheus Transaction
+            <div style="color:green;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED">Confirmed</div>
+            <div style="color:red;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED">Rejected</div>
+            <div style="color:orange;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND">Not yet confirmed</div>
+          </div>
+          <div class="truncate">
+            Operations:
+            <ul>
+              <li
+                v-for="operation in formatMorpheusOperations(transaction.asset)"
+                :key="operation"
+              >- {{ operation }}</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="list-row-border-b">
           <div class="mr-4">{{ $t("TRANSACTION.SENDER") }}</div>
           <div class="truncate">
@@ -229,11 +247,17 @@ import {
   LockService,
   TransactionService,
 } from "@/services";
+import { formatMorpheusOperations, isMorpheusTransaction } from "@/morpheus/utils";
+import { morpheusTxProvider } from "@/morpheus/tx-status";
+import { MorpheusTxStatus } from "@/morpheus/api";
 
 @Component({
   computed: {
     ...mapGetters("currency", { currencySymbol: "symbol" }),
     ...mapGetters("network", ["height"]),
+  },
+  data: () => {
+    return { isMorpheusTransaction, formatMorpheusOperations, morpheusTxProvider, MorpheusTxStatus };
   },
 })
 export default class TransactionDetails extends Vue {
@@ -300,6 +324,7 @@ export default class TransactionDetails extends Vue {
     this.handleMultipayment();
     this.getTimelockStatus();
     this.setInitialBlockHeight();
+    await this.updateMorpheusTxStatuses();
   }
 
   @Watch("currencySymbol")
@@ -318,6 +343,15 @@ export default class TransactionDetails extends Vue {
     this.updatePrice();
     this.handleMultipayment();
     this.getTimelockStatus();
+    await this.updateMorpheusTxStatuses();
+  }
+
+  private async updateMorpheusTxStatuses(): Promise<void> {
+    if(!isMorpheusTransaction(this.transaction.type, this.transaction.typeGroup)) {
+      return;
+    }
+
+    await morpheusTxProvider.load([this.transaction.id]);
   }
 
   private async updatePrice() {

@@ -37,6 +37,7 @@ export default {
 
       const cryptos: { [key: string]: string } = {
         ARK: "Ѧ",
+        HYD: "Ħ",
         BTC: "Ƀ",
         ETH: "Ξ",
         LTC: "Ł",
