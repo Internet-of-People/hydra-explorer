@@ -79,6 +79,11 @@ export default class HeaderSearch extends Vue {
     this.searchCount = 0;
     this.query = this.query.trim();
 
+    if(this.query.startsWith('did:morpheus')) {
+      this.$router.push(`/morpheus-browser/${this.query}`);
+      return;
+    }
+
     const address = this.findByNameInKnownWallets(this.query);
     if (address) {
       this.changePage("wallet", { address });

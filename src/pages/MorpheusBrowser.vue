@@ -1,0 +1,378 @@
+<template>
+  <div class="max-w-2xl mx-auto md:pt-5">
+    <ContentHeader>{{ $t("PAGES.MORPHEUS_BROWSER.TITLE") }}</ContentHeader>
+
+    <section class="page-section mb-5 py-5 md:py-10">
+      <div class="mx-5 sm:mx-10">
+        Here, you can search for Morpheus DID documents at a given height. If you don't provide a height, the result will contain
+        the current state of the document.
+        <div class="flex w-full justify-between mt-5">
+          <div class="w-2/5 mb-4 lg:mb-0">
+            <InputText
+              :label="$t('PAGES.MORPHEUS_BROWSER.SEARCH.DID_INPUT')"
+              name="did"
+              class="pt-0"
+              :value="did"
+              @input="onDidChange"
+            />
+          </div>
+          <div class="w-1/5 lg:w-64 mb-4 lg:mb-0">
+            <InputNumber
+              :label="$t('PAGES.MORPHEUS_BROWSER.SEARCH.AT_HEIGHT_INPUT')"
+              name="at-height"
+              @input="onHeightChange"
+            />
+          </div>
+          <div class="w-1/5 lg:w-64 mb-4 lg:mb-0 text-right">
+            <button class="button-lg h-full w-full" @click="onSearchClick">Search</button>
+          </div>
+        </div>
+        <div v-if="error" class="mt-10 text-red text-center semibold">
+          Invalid DID format
+        </div>
+      </div>
+      
+    </section>
+
+    <section v-if="didDocument" class="mb-5 bg-theme-feature-background xl:rounded-lg flex flex-col md:flex-row items-center px-5 sm:px-10 py-8">
+      <div class="flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
+        <div class="flex-auto min-w-0">
+          <div class="text-grey mb-2">
+            DID
+          </div>
+          <div class="flex">
+            <div class="text-xl text-white semibold truncate">
+              <span class="mr-2">
+                {{ didDocument.did }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex w-full md:block md:w-auto justify-between whitespace-no-wrap">
+          <div class="flex-auto min-w-0 mb-2 text-grey">
+            <span>At Height:</span>
+            <span class="semibold">
+              {{ didDocument.queriedAtHeight }}
+            </span>
+          </div>
+          <div class="flex text-xl text-white">
+            <span class="mr-1">Tombstoned:</span>
+            <span :class="`semibold text-${(didDocument.tombstoned)?'red':'green'}`">
+              {{ (didDocument.tombstoned)?'YES,':'NO' }}
+              <span v-if="didDocument.tombstoned"> at height {{ didDocument.tombstonedAtHeight }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section v-if="didDocument" class="mb-5 page-section xl:rounded-lg items-center px-5 sm:px-10 py-8">
+      <nav class="MorpheusNav">
+        <div 
+          :class="{ active: isKeysTabActive }"
+          class="MorpheusNav--tab"
+          @click="setActiveTab('keys')"
+        >
+          Keys
+          <span>{{ didDocument.keys.length }}</span>
+        </div>
+        <div 
+          :class="{ active: isRightsTabActive }"
+          class="MorpheusNav--tab"
+          @click="setActiveTab('rights')"
+        >
+          Rights
+        </div>
+      </nav>
+
+      <TableWrapper
+        :columns="keyColumns"
+        :rows="keys"
+        no-data-message="No Keys"
+        v-if="isKeysTabActive"
+      >
+        <template slot-scope="data">
+          <div v-if="data.column.field === 'index'">
+            #{{ data.row.index }}
+          </div>
+          <div v-if="data.column.field === 'auth'">
+            {{ data.row.auth }}
+          </div>
+          <div v-if="data.column.field === 'rights'">
+            <ul>
+              <li
+                :key="item"
+                v-for="(item) in data.row.rights"
+              >
+                {{ item }}
+              </li>
+            </ul>
+          </div>
+          <div v-if="data.column.field === 'validFromHeight'">
+            {{ showNullableText(data.row.validFromHeight) }}
+          </div>
+          <div v-if="data.column.field === 'validUntilHeight'">
+            {{ showNullableText(data.row.validUntilHeight) }}
+          </div>
+          <div v-if="data.column.field === 'valid'">
+            <span v-if="data.row.valid" class="text-green">YES</span>
+            <span v-else class="text-red">NO</span>
+          </div>
+        </template>
+      </TableWrapper>
+
+      <TableWrapper
+        :columns="rightColumns"
+        :rows="rights"
+        no-data-message="No Rights"
+        v-if="isRightsTabActive"
+      >
+        <template slot-scope="data">
+          <div v-if="data.column.field === 'right'">
+            {{ data.row.right }}
+          </div>
+          <div v-if="data.column.field === 'keyLink'">
+            {{ data.row.keyLink }}
+          </div>
+          <div v-if="data.column.field === 'valid'">
+            <span v-if="data.row.valid" class="text-green">YES</span>
+            <span v-else class="text-red">NO</span>
+          </div>
+        </template>
+      </TableWrapper>
+    </section>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { Route } from "vue-router";
+import { InputText, InputNumber } from "../components/search/input";
+import { MorpheusAPI } from "../morpheus/api";
+import { IDidDocumentData, ALL_RIGHTS, IKeyRightHistory } from '../morpheus/interfaces';
+
+Component.registerHooks(["beforeRouteEnter"]);
+
+@Component({
+  components: {
+    InputNumber,
+    InputText,
+  },
+})
+export default class MorpheusBrowserPage extends Vue {
+  private currentPage = 1;
+  private did = '';
+  private atHeight;
+  private didDocument: IDidDocumentData = null;
+  private tabActive = 'keys';
+  private error = false;
+
+  get rights() {
+    if(!this.didDocument) {
+      return [];
+    }
+
+    const rights = [];
+
+    for(const right of ALL_RIGHTS) {
+      const rightHistories: IKeyRightHistory[] = this.didDocument.rights[right];
+      for(const history of rightHistories) {
+        rights.push({
+          right,
+          keyLink: history.keyLink,
+          valid: history.valid,
+        });
+      }
+    }
+    
+    return rights;
+  }
+
+  get keys() {
+    if(!this.didDocument) {
+      return [];
+    }
+
+    const keys = [];
+    for(const key of this.didDocument.keys) {
+      const keyRights = [];
+
+      for(const right of ALL_RIGHTS) {
+        const rightHistories: IKeyRightHistory[] = this.didDocument.rights[right];
+        for(const history of rightHistories) {
+          if(history.keyLink.startsWith('#') && parseInt(history.keyLink.substring(1), 10) === key.index) {
+            keyRights.push(right);
+          }
+        }
+      }
+
+      keys.push({
+        index: key.index,
+        auth: key.auth,
+        validFromHeight: key.validFromHeight,
+        validUntilHeight: key.validUntilHeight,
+        valid: key.valid,
+        rights: keyRights
+      });
+    }
+    
+    return keys;
+  }
+
+  get keyColumns() {
+    return [
+      {
+        label: 'Index', 
+        field: 'index', 
+        thClass: "start-cell semibold",
+        tdClass: "start-cell",
+      },
+      {
+        label: 'Auth',
+        field: "auth",
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+      {
+        label: 'Rights',
+        field: "rights",
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+      {
+        label: 'Valid From',
+        field: "validFromHeight",
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+      {
+        label: 'Valid Until',
+        field: "validUntilHeight",
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+      {
+        label: 'Valid',
+        field: "valid",
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+    ];
+  }
+
+  get rightColumns() {
+    return [
+      {
+        label: 'Right', 
+        field: 'right', 
+        thClass: "start-cell semibold",
+        tdClass: "start-cell",
+      },
+      {
+        label: 'Key Link',
+        field: "keyLink",
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+      {
+        label: 'Valid',
+        field: "valid",
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+    ];
+  }
+
+  get isKeysTabActive() {
+    return this.tabActive === "keys";
+  }
+
+  get isRightsTabActive() {
+    return this.tabActive === "rights";
+  }
+
+  public async beforeRouteEnter(to: Route, from: Route, next: (vm: any) => void) {
+    try {
+      next((vm) => {
+        if(to.params.did) {
+          vm.did = to.params.did;
+          vm.search();
+        }
+      });
+    }
+    catch(e) {
+      console.log(e);
+    }
+  }
+
+  private showNullableText(text: string|null) {
+    return text ? text : '-';
+  }
+
+  private setActiveTab(active: string) {
+    this.tabActive = active;
+  }
+
+  private onDidChange(event: any): void {
+    const { name, value } = event.target;
+    this.did = value;
+  }
+
+  private onHeightChange(event: any): void {
+    const { name, value } = event.target;
+    this.atHeight = !value ? undefined : parseInt(value, 10);
+  }
+
+  private onSearchClick(): void {
+    const path = `/morpheus-browser/${this.did}`;
+    if(this.did) {
+      if(this.$route.path !== path) {
+        this.$router.push(path);
+      }
+      else {
+        this.search();
+      }
+    }
+  }
+
+  private async search(): Promise<void> {
+    try {
+      this.error = false;
+      this.didDocument = await MorpheusAPI.getDidDocument(this.did, this.atHeight);
+    } catch(e) {
+      this.error = true;
+    }
+  }
+}
+</script>
+
+<style scoped>
+.MorpheusNav {
+  @apply .flex .items-end .mb-8 .border-b .whitespace-no-wrap .overflow-y-auto;
+}
+
+.MorpheusNav--tab {
+  @apply .text-lg .text-theme-text-secondary .border-transparent .mr-4 .py-4 .px-2 .cursor-pointer .border-b-3;
+}
+
+.MorpheusNav--tab:hover {
+  @apply .text-theme-text-primary .border-blue;
+}
+
+.MorpheusNav--tab.active {
+  @apply .text-lg .border-blue .text-theme-text-primary;
+}
+
+.MorpheusNav--tab.disabled {
+  @apply .pointer-events-none .text-theme-text-tertiary;
+}
+
+.MorpheusNav--tab > span {
+  @apply .text-xs .text-theme-text-tertiary;
+}
+
+.MorpheusNav--tab.active > span {
+  @apply .text-theme-text-secondary;
+}
+</style>

@@ -165,7 +165,7 @@ export default {
   SEARCH: {
     PLACEHOLDER: {
       SHORT: "Search",
-      LONG: "Find a block, transaction, address or delegate",
+      LONG: "Find a block, transaction, address, delegate or DID",
     },
     NO_RESULTS: "Nothing matched your search",
   },
@@ -262,13 +262,19 @@ export default {
         BALANCE_TO: "Balance to",
       },
     },
+    MORPHEUS_BROWSER: {
+      TITLE: "Morpheus Browser",
+      SEARCH: {
+        DID_INPUT: "DID, eg.: did:morpheus:ezbeWGSY2dqcUBqT8K7R14xr",
+        AT_HEIGHT_INPUT: "At Height, eg.: 4242"
+      }
+    },
     NOT_FOUND: {
       TITLE: "Ooops!",
       PAGE: "Sorry, page not found",
       DATA: "Sorry, {dataType} {dataId} could not be found on the blockchain",
     },
   },
-
   PAGINATION: {
     ALL: "All",
     NEXT: "Next",

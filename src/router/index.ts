@@ -25,6 +25,7 @@ const TopWalletsComponent = () => import(/* webpackChunkName: "top-wallets" */ "
 const BusinessesComponent = () => import(/* webpackChunkName: "businesses" */ "@/pages/Businesses.vue");
 const BridgechainsComponent = () => import(/* webpackChunkName: "bridgechains" */ "@/pages/Bridgechains.vue");
 const AdvancedSearchComponent = () => import(/* webpackChunkName: "search" */ "@/pages/AdvancedSearch.vue");
+const MorpheusBrowserComponent = () => import(/* webpackChunkName: "morpheus-browser" */ "@/pages/MorpheusBrowser.vue");
 const DelegateComponent = () => import(/* webpackChunkName: "delegates" */ "@/pages/Delegates.vue");
 const NotFoundComponent = () => import(/* webpackChunkName: "404" */ "@/pages/404.vue");
 
@@ -196,6 +197,18 @@ const router = new Router({
       name: "advanced-search",
       component: AdvancedSearchComponent,
       meta: { title: (route: Route) => getTitle("Advanced Search") },
+    },
+    {
+      path: "/morpheus-browser",
+      name: "morpheus-browser",
+      component: MorpheusBrowserComponent,
+      meta: { title: (route: Route) => getTitle("Morpheus Browser") },
+    },
+    {
+      path: "/morpheus-browser/:did",
+      name: "morpheus-browser-did",
+      component: MorpheusBrowserComponent,
+      meta: { title: (route: Route) => getTitle("Morpheus Browser") },
     },
     {
       path: "/delegates/resigned",

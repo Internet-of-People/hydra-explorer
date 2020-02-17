@@ -1,25 +1,77 @@
 <template>
   <div>
-    <section class="page-section py-5 md:py-10 mb-5">
-      <div class="px-5 sm:px-10">
-        <div class="list-row-border-b" v-if="isMorpheusTransaction(transaction.type, transaction.typeGroup)">
-          <div class="mr-4">
-            Morpheus Transaction
-            <div style="color:green;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED">Confirmed</div>
-            <div style="color:red;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED">Rejected</div>
-            <div style="color:orange;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND">Not yet confirmed</div>
-          </div>
-          <div class="truncate">
-            Operations:
-            <ul>
-              <li
-                v-for="operation in formatMorpheusOperations(transaction.asset)"
-                :key="operation"
-              >- {{ operation }}</li>
-            </ul>
+    <section v-if="isMorpheusTransaction(transaction.type, transaction.typeGroup)" class="page-section py-5 md:py-5 px-10 mb-5">
+      <div class="flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
+        <div class="flex-auto min-w-0">
+          <div class="text-xl">
+            Morpheus Transaction (Layer 2)
           </div>
         </div>
+        <div class="flex w-full md:block md:w-auto justify-between mb-5 md:mb-0 whitespace-no-wrap">
+          <div class="flex text-xl semibold">
+            <div class="text-green" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED">Confirmed</div>
+            <div class="text-red" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED">Rejected</div>
+            <div class="text-orange" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND">Not yet confirmed</div>
+          </div>
+        </div>
+      </div>
+      <hr class="mt-5 w-full">
 
+      <nav class="MorpheusNav">
+        <div 
+          :class="{ active: isDidOperationsTabActive }"
+          class="MorpheusNav--tab"
+          @click="setActiveTab('didOperations')"
+        >
+          DID Operations
+        </div>
+        <div 
+          :class="{ active: isOtherOperationsTabActive }"
+          class="MorpheusNav--tab"
+          @click="setActiveTab('otherOperations')"
+        >
+          Other Operations
+        </div>
+      </nav>
+      <div>
+        <template v-if="isDidOperationsTabActive">
+          <div v-if="morpheusOperations.didOperations.length===0">
+            No Operations.
+          </div>
+          <div
+            class="mt-5"
+            v-for="(did) in morpheusOperations.didOperations.keys()"
+            :key="did"
+          >
+            <RouterLink :to="`/morpheus-browser/${did}`">{{ did }}</RouterLink>
+            <ul>
+              <li
+                :key="operation"
+                v-for="operation in morpheusOperations.didOperations.get(did)"
+              >
+                - {{ operation }}
+              </li>
+            </ul>
+          </div>
+        </template>
+        <template v-if="isOtherOperationsTabActive">
+          <div v-if="morpheusOperations.otherOperations.length===0">
+            No Operations.
+          </div>
+          <ul>
+            <li
+              :key="operation"
+              v-for="(operation) in morpheusOperations.otherOperations"
+            >
+              - {{ operation }}
+            </li>
+          </ul>
+        </template>
+      </div>
+    </section>
+
+    <section class="page-section py-5 md:py-10 mb-5">
+      <div class="px-5 sm:px-10">
         <div class="list-row-border-b">
           <div class="mr-4">{{ $t("TRANSACTION.SENDER") }}</div>
           <div class="truncate">
@@ -247,7 +299,7 @@ import {
   LockService,
   TransactionService,
 } from "@/services";
-import { formatMorpheusOperations, isMorpheusTransaction } from "@/morpheus/utils";
+import { formatMorpheusOperations, isMorpheusTransaction, OperationDetails } from "@/morpheus/utils";
 import { morpheusTxProvider } from "@/morpheus/tx-status";
 import { MorpheusTxStatus } from "@/morpheus/api";
 
@@ -270,6 +322,15 @@ export default class TransactionDetails extends Vue {
   private multipaymentAmount: BigNumber | null = null;
   private timelockStatus: TranslateResult | null = null;
   private timelockLink: string | null = null;
+  private tabActive: string = 'didOperations';
+
+  get isDidOperationsTabActive() {
+    return this.tabActive === "didOperations";
+  }
+
+  get isOtherOperationsTabActive() {
+    return this.tabActive === "otherOperations";
+  }
 
   get confirmations() {
     return this.initialBlockHeight ? this.height - this.initialBlockHeight : this.transaction.confirmations;
@@ -316,6 +377,14 @@ export default class TransactionDetails extends Vue {
       default:
         return [];
     }
+  }
+
+  get morpheusOperations(): OperationDetails {
+    return formatMorpheusOperations(this.transaction.asset);
+  }
+
+  private setActiveTab(active: string) {
+    this.tabActive = active;
   }
 
   @Watch("transaction")
@@ -396,5 +465,32 @@ export default class TransactionDetails extends Vue {
 <style scoped>
 .list-row-border-b-no-wrap > div:last-child {
   text-align: right;
+}
+.MorpheusNav {
+  @apply .flex .items-end .mb-8 .border-b .whitespace-no-wrap .overflow-y-auto;
+}
+
+.MorpheusNav--tab {
+  @apply .text-lg .text-theme-text-secondary .border-transparent .mr-4 .py-4 .px-2 .cursor-pointer .border-b-3;
+}
+
+.MorpheusNav--tab:hover {
+  @apply .text-theme-text-primary .border-blue;
+}
+
+.MorpheusNav--tab.active {
+  @apply .text-lg .border-blue .text-theme-text-primary;
+}
+
+.MorpheusNav--tab.disabled {
+  @apply .pointer-events-none .text-theme-text-tertiary;
+}
+
+.MorpheusNav--tab > span {
+  @apply .text-xs .text-theme-text-tertiary;
+}
+
+.MorpheusNav--tab.active > span {
+  @apply .text-theme-text-secondary;
 }
 </style>
