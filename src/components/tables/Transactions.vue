@@ -75,7 +75,7 @@
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { mapGetters } from "vuex";
 import { IDelegate, ISortParameters, ITransaction } from "@/interfaces";
-import CryptoCompareService from "@/services/crypto-compare";
+//import CryptoCompareService from "@/services/crypto-compare";
 
 @Component({
   computed: {
@@ -190,7 +190,7 @@ export default class TableTransactionsDesktop extends Vue {
   }
 
   private async fetchPrice(transaction: ITransaction) {
-    transaction.price = await CryptoCompareService.dailyAverage(transaction.timestamp.unix);
+    //transaction.price = await CryptoCompareService.dailyAverage(transaction.timestamp.unix);
   }
 
   private async updatePrices() {

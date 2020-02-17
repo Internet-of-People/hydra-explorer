@@ -1,17 +1,16 @@
 {
-  "title": "DHYD Explorer",
-  "server": "http://dev.hydra.iop.global:4703/api",
-  "alias": "Development",
+  "title": "THYD Explorer",
+  "server": "http://127.0.0.1:4703/api",
+  "alias": "Test",
   "activeDelegates": 53,
-  "rewardOffset": 50400,
+  "rewardOffset": 7200,
   "blockReward": 8,
   "currencies": [],
   "knownWallets": {
-    "dEZtDoWrorqHjLLP2YmktmAY5MZwW4jA74": "Genesis Wallet"
   },
   "defaults": {
-    "token": "DHYD",
-    "symbol": "DĦ",
+    "token": "THYD",
+    "symbol": "TĦ",
     "currency": null,
     "priceChartOptions": {
       "enabled": false,

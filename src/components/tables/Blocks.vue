@@ -65,7 +65,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { IBlock, ISortParameters } from "@/interfaces";
-import CryptoCompareService from "@/services/crypto-compare";
+//import CryptoCompareService from "@/services/crypto-compare";
 import { mapGetters } from "vuex";
 
 @Component({
@@ -163,7 +163,7 @@ export default class TableBlocksDesktop extends Vue {
   }
 
   private async fetchPrice(block: IBlock) {
-    block.price = await CryptoCompareService.dailyAverage(block.timestamp.unix);
+    //block.price = await CryptoCompareService.dailyAverage(block.timestamp.unix);
   }
 
   private async updatePrices() {

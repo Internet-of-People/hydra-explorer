@@ -1,14 +1,17 @@
 {
-  "title": "TARK Explorer",
-  "server": "http://127.0.0.1:4003/api",
-  "alias": "Testnet local",
-  "activeDelegates": 51,
-  "rewardOffset": 75600,
+  "title": "THYD Explorer",
+  "server": "http://test.hydra.iop.global:4703/api",
+  "alias": "Test",
+  "activeDelegates": 53,
+  "rewardOffset": 7200,
+  "blockReward": 8,
   "currencies": [],
-  "knownWallets": {},
+  "knownWallets": {
+    "tjseecxRmob5qBS2T3qc8frXDKz3YUGB8J": "Genesis Wallet"
+  },
   "defaults": {
-    "token": "TARK",
-    "symbol": "TѦ",
+    "token": "THYD",
+    "symbol": "TĦ",
     "currency": null,
     "priceChartOptions": {
       "enabled": false,

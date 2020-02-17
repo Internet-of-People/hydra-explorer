@@ -112,7 +112,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { mapGetters } from "vuex";
-import CryptoCompareService from "@/services/crypto-compare";
+//import CryptoCompareService from "@/services/crypto-compare";
 import { IBlock } from "../../interfaces";
 
 @Component({
@@ -147,7 +147,7 @@ export default class BlockDetails extends Vue {
       return;
     }
 
-    this.price = await CryptoCompareService.dailyAverage(this.block.timestamp.unix);
+    //this.price = await CryptoCompareService.dailyAverage(this.block.timestamp.unix);
   }
 }
 </script>

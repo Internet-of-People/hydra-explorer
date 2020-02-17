@@ -19,7 +19,7 @@
               class="absolute text-theme-transaction-icon text-2xl"
               style="top: 50%; left: 50%; transform: translate(-50%, -50%);"
             >
-              {{ networkSymbol }}
+              <!--{{ networkSymbol }}-->
             </div>
           </div>
           <div class="flex-auto min-w-0">

@@ -15,12 +15,13 @@ class BusinessService {
   }
 
   public async isEnabled(): Promise<boolean> {
-    try {
+    return false;
+    /*try {
       const response = (await ApiService.get("businesses", {})) as IApiBusinessesWrapper;
       return response.data ? true : false;
     } catch (e) {
       return false;
-    }
+    }*/
   }
 }
 

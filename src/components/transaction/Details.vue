@@ -225,7 +225,10 @@ import { TranslateResult } from "vue-i18n";
 import { mapGetters } from "vuex";
 import { ITransaction } from "@/interfaces";
 import { CoreTransaction, MagistrateTransaction, TypeGroupTransaction } from "@/enums";
-import { CryptoCompareService, LockService, TransactionService } from "@/services";
+import {
+  LockService,
+  TransactionService,
+} from "@/services";
 
 @Component({
   computed: {
@@ -318,7 +321,7 @@ export default class TransactionDetails extends Vue {
   }
 
   private async updatePrice() {
-    this.price = await CryptoCompareService.dailyAverage(this.transaction.timestamp.unix);
+    //this.price = await CryptoCompareService.dailyAverage(this.transaction.timestamp.unix);
   }
 
   private setInitialBlockHeight() {

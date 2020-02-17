@@ -290,6 +290,7 @@ export default {
     MAIN: "Main",
     DEVELOPMENT: "Development",
     SUPPLY: "Supply",
+    TEST: "Test",
     MARKET_CAP: "Market Cap",
     TESTNET: "Testnet Local",
   },
