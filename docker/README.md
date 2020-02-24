@@ -4,8 +4,7 @@
 
 ```bash
 # Build
-$ docker build -f docker/[testnet|devnet|mainnet].Dockerfile -t internetofpeople/hydra-explorer:2.6.0-[testnet|devnet|mainnet] .
-# Where 2.6.0 refers to the Ark's explorer release version.
+$ docker build -f docker/[testnet|devnet|mainnet].Dockerfile -t internetofpeople/hydra-explorer:latest-[testnet|devnet|mainnet] -t internetofpeople/hydra-explorer:[SEMVER]-[testnet|devnet|mainnet] .
 ```
 
 ```bash
