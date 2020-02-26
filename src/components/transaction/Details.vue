@@ -24,6 +24,7 @@
           @click="setActiveTab('didOperations')"
         >
           DID Operations
+          <span>{{morpheusOperations.didOperationsCount}}</span>
         </div>
         <div 
           :class="{ active: isOtherOperationsTabActive }"
@@ -31,19 +32,21 @@
           @click="setActiveTab('otherOperations')"
         >
           Other Operations
+          <span>{{morpheusOperations.otherOperationsCount}}</span>
         </div>
       </nav>
-      <div>
+      <div class="px-2">
         <template v-if="isDidOperationsTabActive">
-          <div v-if="morpheusOperations.didOperations.length===0">
+          <div v-if="morpheusOperations.didOperationsCount===0" class="text-theme-text-secondary">
             No Operations.
           </div>
           <div
-            class="mt-5"
             v-for="(did) in morpheusOperations.didOperations.keys()"
             :key="did"
           >
-            <RouterLink :to="`/morpheus-browser/${did}`">{{ did }}</RouterLink>
+            <div class="my-2">
+              <RouterLink :to="`/morpheus-browser/${did}`">{{ did }}</RouterLink>
+            </div>
             <ul>
               <li
                 :key="operation"
@@ -55,7 +58,7 @@
           </div>
         </template>
         <template v-if="isOtherOperationsTabActive">
-          <div v-if="morpheusOperations.otherOperations.length===0">
+          <div v-if="morpheusOperations.otherOperations.length===0" class="text-theme-text-secondary">
             No Operations.
           </div>
           <ul>

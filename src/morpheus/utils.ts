@@ -9,14 +9,31 @@ import {
   ISignableOperationData,
   IRevokeKeyData,
   IRevokeRightData,
+  IRegisterBeforeProofData,
 } from "./interfaces";
 
 export class OperationDetails {
-  constructor(public didOperations: Map<string,string[]>, public otherOperations: string[]){}
+
+  constructor(
+    public readonly didOperations: Map<string,string[]>,
+    public readonly otherOperations: string[]
+  ) {
+  }
+
+  public get didOperationsCount(): number {
+    let count = 0;
+    for (const [_did, ops] of this.didOperations.entries()) {
+      count += ops.length;
+    }
+    return count;
+  }
+
+  public get otherOperationsCount(): number {
+    return this.otherOperations.length;
+  }
 }
 
-export const formatMorpheusSignableOperation = (operation: ISignableOperationData): string[] => {
-  const signable = (operation as unknown) as ISignableOperationData;
+export const formatMorpheusSignableOperation = (signable: ISignableOperationData): string[] => {
   if(signable.operation === SignableOperationType.AddKey) {
     return [
       signable.operation,
@@ -57,40 +74,45 @@ export const formatMorpheusOperations = (asset: IMorpheusAsset): OperationDetail
     return new OperationDetails(didOperations, otherOperations);
   }
 
-  for(const attempt of asset.operationAttempts) {
-    if(attempt.operation === OperationType.Signed) {
-      for(const signable of (attempt as ISignedOperationsData).signables) {
-        if(
-          signable.operation === SignableOperationType.AddKey ||
-          signable.operation === SignableOperationType.RevokeKey
-        ) {
-          const did = (signable as IAddKeyData).did;
-          if(!didOperations.has(did)){
-            didOperations.set(did, []);
-          }
-          didOperations.get(did).push(signable.operation);
+  const addDidOp = (did: string, operation: string): void => {
+    if(!didOperations.has(did)){
+      didOperations.set(did, []);
+    }
+    didOperations.get(did).push(operation);
+  }
+
+  for (const attempt of asset.operationAttempts) {
+    if (attempt.operation === OperationType.Signed) {
+      for (const signable of (attempt as ISignedOperationsData).signables) {
+        if (signable.operation === SignableOperationType.AddKey) {
+          const { did, auth, expiresAtHeight } = signable as IAddKeyData;
+          const expiration = expiresAtHeight ? ` (expires at ${expiresAtHeight})` : ''
+          addDidOp(did, `Added key ${auth}${expiration}`);
         }
-        else if(
-          signable.operation === SignableOperationType.AddRight ||
-          signable.operation === SignableOperationType.RevokeRight
-        ) {
-          const did = (signable as IAddRightData).did;
-          if(!didOperations.has(did)){
-            didOperations.set(did, []);
-          }
-          didOperations.get(did).push(`${signable.operation} / ${(signable as IAddRightData).right}`);
+        else if (signable.operation === SignableOperationType.RevokeKey) {
+          const { did, auth } = signable as IRevokeKeyData;
+          addDidOp(did, `Revoked key ${auth}`);
         }
-        else if(signable.operation === SignableOperationType.TombstoneDid) {
-          const did = (signable as ITombstoneDidData).did;
-          if(!didOperations.has(did)){
-            didOperations.set(did, []);
-          }
-          didOperations.get(did).push(signable.operation);
+        else if (signable.operation === SignableOperationType.AddRight) {
+          const { did, right, auth } = signable as IAddRightData;
+          addDidOp(did, `Added '${right}' right to key ${auth}`);
+        }
+        else if (signable.operation === SignableOperationType.RevokeRight) {
+          const { did, right, auth } = signable as IRevokeRightData;
+          addDidOp(did, `Revoked '${right}' right from key ${auth}`);
+        }
+        else if (signable.operation === SignableOperationType.TombstoneDid) {
+          const { did } = signable as ITombstoneDidData;
+          addDidOp(did, `Tombstoned DID`);
         }
         else {
-          otherOperations.push(signable.operation);
+          addDidOp(signable.did, signable.operation)
         }
       }
+    }
+    else if (attempt.operation == OperationType.RegisterBeforeProof) {
+      const { contentId } = attempt as IRegisterBeforeProofData;
+      otherOperations.push(`Registered content ${contentId}`);
     }
     else {
       otherOperations.push(attempt.operation);

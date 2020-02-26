@@ -4,9 +4,7 @@ export interface IMorpheusAsset {
 
 export enum OperationType {
   Signed = "signed",
-
   RegisterBeforeProof = "registerBeforeProof",
-  RevokeBeforeProof = "revokeBeforeProof",
 }
 
 export enum SignableOperationType {
@@ -14,9 +12,6 @@ export enum SignableOperationType {
   RevokeKey = "revokeKey",
   AddRight = "addRight",
   RevokeRight = "revokeRight",
-  AddService = "addService",
-  // TODO consider having updateService
-  RemoveService = "removeService",
   TombstoneDid = "tombstoneDid",
 }
 
@@ -25,6 +20,8 @@ export interface IOperationData {
 }
 
 export interface ISignableOperationData {
+  did: Did;
+  lastTxId: TransactionId | null;
   operation: SignableOperationType;
 }
 
@@ -37,15 +34,16 @@ export interface ISignedOperationsData extends IOperationData {
   signature: SignatureData;
 }
 
-export type Did = string;
-export type AuthenticationData = string;
-
-export enum Right {
-  Impersonate = 'impersonate',
-  Update = 'update',
+export interface IRegisterBeforeProofData extends IOperationData {
+  contentId: string;
 }
 
-export const ALL_RIGHTS = [ Right.Impersonate, Right.Update ];
+export type Did = string;
+export type TransactionId = string;
+export type AuthenticationData = string;
+
+export type Right = string;
+export const ALL_RIGHTS = [ 'impersonate', 'update' ];
 
 export interface IKeyData {
   // TODO an additional "type" property should return something
@@ -84,7 +82,6 @@ export interface IDidDocumentData {
  * Data transfer object of AddKey.
  */
 export interface IAddKeyData extends ISignableOperationData {
-  did: Did;
   auth: AuthenticationData;
   expiresAtHeight?: number;
 }
@@ -93,7 +90,6 @@ export interface IAddKeyData extends ISignableOperationData {
  * Data transfer object of RevokeKey.
  */
 export interface IRevokeKeyData extends ISignableOperationData {
-  did: Did;
   auth: AuthenticationData;
 }
 
@@ -101,7 +97,6 @@ export interface IRevokeKeyData extends ISignableOperationData {
  * Data transfer object of AddRight.
  */
 export interface IAddRightData extends ISignableOperationData {
-  did: Did;
   auth: AuthenticationData;
   right: Right;
 }
@@ -110,7 +105,6 @@ export interface IAddRightData extends ISignableOperationData {
  * Data transfer object of RevokeRight.
  */
 export interface IRevokeRightData extends ISignableOperationData {
-  did: Did;
   auth: AuthenticationData;
   right: Right;
 }
@@ -118,8 +112,8 @@ export interface IRevokeRightData extends ISignableOperationData {
 /**
  * Data transfer object of Tombstone.
  */
+/* eslint @typescript-eslint/no-empty-interface:0 */
 export interface ITombstoneDidData extends ISignableOperationData {
-  did: Did;
 }
 
 export interface DidOperation {
