@@ -1,6 +1,6 @@
 import axios from "axios";
 import store from "../store";
-import { IDidDocumentData } from './interfaces';
+import { IDidDocumentData, DidOperation } from './interfaces';
 
 export enum MorpheusTxStatus {
   CONFIRMED,
@@ -37,6 +37,15 @@ export class MorpheusAPI {
     
     const resp = await axios.get(url);
     return resp.data as IDidDocumentData;
+  }
+
+  public static async getOperationsAttempts(did: string, untilHeight: number): Promise<DidOperation[]> {
+    const url = untilHeight 
+      ? `${this.getBaseUrl()}/did/${did}/operation-attempts/0/${untilHeight}` 
+      : `${this.getBaseUrl()}/did/${did}/operation-attempts/0`;
+
+    const resp = await axios.get(url);
+    return resp.data;
   }
 
   private static getBaseUrl(): string {

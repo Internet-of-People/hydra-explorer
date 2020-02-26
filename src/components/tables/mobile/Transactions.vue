@@ -40,9 +40,9 @@
           <div v-else v-tooltip="`${MorpheusTxStatus[morpheusTxProvider.get(transaction.id)]}`">
             Morpheus Transaction
             <strong>
-              <span style="color:green;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED">&#8226;</span>
-              <span style="color:red;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED">&#8226;</span>
-              <span style="color:orange;" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND">&#8226;</span>
+              <SvgIcon v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED" name="forging" class="text-green ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED" name="cross" class="text-red ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND" name="circle-o" class="text-orange ml-2" view-box="0 0 12 12" style="display: inline;" />
             </strong>
           </div>
         </div>

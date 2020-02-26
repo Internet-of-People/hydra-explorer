@@ -121,3 +121,10 @@ export interface IRevokeRightData extends ISignableOperationData {
 export interface ITombstoneDidData extends ISignableOperationData {
   did: Did;
 }
+
+export interface DidOperation {
+  transactionId: string;
+  blockHeight: number;
+  data: ISignableOperationData;
+  valid: boolean;
+}

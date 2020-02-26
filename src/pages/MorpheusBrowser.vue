@@ -31,7 +31,6 @@
           Invalid DID format
         </div>
       </div>
-      
     </section>
 
     <section v-if="didDocument" class="mb-5 bg-theme-feature-background xl:rounded-lg flex flex-col md:flex-row items-center px-5 sm:px-10 py-8">
@@ -83,6 +82,13 @@
           @click="setActiveTab('rights')"
         >
           Rights
+        </div>
+        <div 
+          :class="{ active: isOperationsTabActive }"
+          class="MorpheusNav--tab"
+          @click="setActiveTab('operations')"
+        >
+          History
         </div>
       </nav>
 
@@ -141,6 +147,37 @@
           </div>
         </template>
       </TableWrapper>
+
+      <TableWrapper
+        :columns="operationColumns"
+        :rows="operations"
+        no-data-message="No Operations"
+        v-if="isOperationsTabActive"
+      >
+        <template slot-scope="data">
+          <div v-if="data.column.field === 'confirmed'">
+            <SvgIcon v-if="data.row.confirmed" name="forging" class="text-green" view-box="0 0 22 22" style="display:inline;" />
+            <SvgIcon v-else name="cross" class="text-red" view-box="0 0 22 22" style="display:inline;" />
+          </div>
+          <div v-if="data.column.field === 'operation'">
+            <ul>
+              <li
+                :key="detail"
+                v-for="(detail,index) in data.row.operation"
+              >
+                <strong v-if="index===0">{{ detail }}</strong>
+                <span class="text-sm pl-2" v-else>{{ detail }}</span>
+              </li>
+            </ul>
+          </div>
+          <div v-if="data.column.field === 'blockHeight'">
+            {{ data.row.blockHeight }}
+          </div>
+          <div v-if="data.column.field === 'transactionId'">
+            <RouterLink :to="`/transaction/${data.row.transactionId}`">{{ data.row.transactionId }}</RouterLink>
+          </div>
+        </template>
+      </TableWrapper>
     </section>
   </div>
 </template>
@@ -150,7 +187,8 @@ import { Component, Vue } from "vue-property-decorator";
 import { Route } from "vue-router";
 import { InputText, InputNumber } from "../components/search/input";
 import { MorpheusAPI } from "../morpheus/api";
-import { IDidDocumentData, ALL_RIGHTS, IKeyRightHistory } from '../morpheus/interfaces';
+import { IDidDocumentData, ALL_RIGHTS, IKeyRightHistory, IOperationData, DidOperation } from '../morpheus/interfaces';
+import { formatMorpheusSignableOperation } from '../morpheus/utils';
 
 Component.registerHooks(["beforeRouteEnter"]);
 
@@ -165,6 +203,7 @@ export default class MorpheusBrowserPage extends Vue {
   private did = '';
   private atHeight;
   private didDocument: IDidDocumentData = null;
+  private operationAttempts: DidOperation[] = null;
   private tabActive = 'keys';
   private error = false;
 
@@ -218,6 +257,17 @@ export default class MorpheusBrowserPage extends Vue {
     }
     
     return keys;
+  }
+
+  get operations() {
+    return this.operationAttempts.map((attempt) => {
+      return {
+        confirmed: attempt.valid,
+        operation: formatMorpheusSignableOperation(attempt.data),
+        blockHeight: attempt.blockHeight,
+        transactionId: attempt.transactionId,
+      };
+    });
   }
 
   get keyColumns() {
@@ -284,12 +334,45 @@ export default class MorpheusBrowserPage extends Vue {
     ];
   }
 
+  get operationColumns() {
+    return [
+      {
+        label: 'Confirmed', 
+        field: 'confirmed', 
+        thClass: "semibold",
+        tdClass: "text-center",
+      },
+      {
+        label: 'Operation', 
+        field: 'operation', 
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+      {
+        label: 'At Height', 
+        field: 'blockHeight', 
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+      {
+        label: 'Tx ID', 
+        field: 'transactionId', 
+        thClass: "semibold",
+        tdClass: "break-all",
+      },
+    ];
+  }
+
   get isKeysTabActive() {
     return this.tabActive === "keys";
   }
 
   get isRightsTabActive() {
     return this.tabActive === "rights";
+  }
+
+  get isOperationsTabActive() {
+    return this.tabActive === "operations";
   }
 
   public async beforeRouteEnter(to: Route, from: Route, next: (vm: any) => void) {
@@ -339,7 +422,12 @@ export default class MorpheusBrowserPage extends Vue {
   private async search(): Promise<void> {
     try {
       this.error = false;
-      this.didDocument = await MorpheusAPI.getDidDocument(this.did, this.atHeight);
+      const results = await Promise.all([
+        MorpheusAPI.getDidDocument(this.did, this.atHeight),
+        MorpheusAPI.getOperationsAttempts(this.did, this.atHeight),
+      ]);
+      this.didDocument = results[0];
+      this.operationAttempts = results[1];
     } catch(e) {
       this.error = true;
     }

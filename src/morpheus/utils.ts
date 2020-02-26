@@ -5,15 +5,52 @@ import {
   SignableOperationType,
   IAddKeyData,
   IAddRightData,
-  ITombstoneDidData
+  ITombstoneDidData,
+  ISignableOperationData,
+  IRevokeKeyData,
+  IRevokeRightData,
 } from "./interfaces";
 
 export class OperationDetails {
-  constructor(public didOperations: Map<String,String[]>, public otherOperations: String[]){}
+  constructor(public didOperations: Map<string,string[]>, public otherOperations: string[]){}
+}
+
+export const formatMorpheusSignableOperation = (operation: ISignableOperationData): string[] => {
+  const signable = (operation as unknown) as ISignableOperationData;
+  if(signable.operation === SignableOperationType.AddKey) {
+    return [
+      signable.operation,
+      `Key: ${(signable as IAddKeyData).auth}`,
+      `Expires: ${formatUndefined((signable as IAddKeyData).expiresAtHeight)}`
+    ];
+  }
+  else if(signable.operation === SignableOperationType.RevokeKey) {
+    return [
+      signable.operation,
+      `Key: ${(signable as IRevokeKeyData).auth}`,
+    ];
+  }
+  else if(signable.operation === SignableOperationType.AddRight) {
+    return [
+      signable.operation,
+      `Right: ${(signable as IAddRightData).right}`,
+      `To Key: ${(signable as IAddRightData).auth}`,
+    ];
+  }
+  else if(signable.operation === SignableOperationType.RevokeRight) {
+    return [
+      signable.operation,
+      `Right: ${(signable as IRevokeRightData).right}`,
+      `From Key: ${(signable as IRevokeRightData).auth}`,
+    ];
+  }
+  else {
+    return [signable.operation];
+  }
 }
 
 export const formatMorpheusOperations = (asset: IMorpheusAsset): OperationDetails => {
-  const didOperations: Map<String,String[]> = new Map();
+  const didOperations: Map<string,string[]> = new Map();
   const otherOperations = [];
 
   if(!asset) {
@@ -66,3 +103,10 @@ export const formatMorpheusOperations = (asset: IMorpheusAsset): OperationDetail
 export const isMorpheusTransaction = (type: number, typeGroup: number): boolean => {
   return typeGroup === 4242 && type === 1;
 };
+
+const formatUndefined = (value: string | number | undefined) => {
+  if(!value) {
+    return '-';
+  }
+  return value;
+}
