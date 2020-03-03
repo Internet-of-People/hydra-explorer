@@ -4,6 +4,11 @@ import { CoreTransaction, MagistrateTransaction, TypeGroupTransaction } from "@/
 export const transactionTypes: ITransactionType[] = [
   { key: "ALL", type: -1 },
   { key: "TRANSFER", type: CoreTransaction.TRANSFER, typeGroup: TypeGroupTransaction.CORE },
+  {
+    key: "MORPHEUS_TRANSACTION",
+    type: 1,
+    typeGroup: 4242,
+  },
   { key: "SECOND_SIGNATURE", type: CoreTransaction.SECOND_SIGNATURE, typeGroup: TypeGroupTransaction.CORE },
   { key: "DELEGATE_REGISTRATION", type: CoreTransaction.DELEGATE_REGISTRATION, typeGroup: TypeGroupTransaction.CORE },
   { key: "VOTE", type: CoreTransaction.VOTE, typeGroup: TypeGroupTransaction.CORE },

@@ -108,6 +108,7 @@ export default {
       BRIDGECHAIN_REGISTRATION: "Bridgechain Registration",
       BRIDGECHAIN_RESIGNATION: "Bridgechain Resignation",
       BRIDGECHAIN_UPDATE: "Bridgechain Update",
+      MORPHEUS_TRANSACTION: "Morpheus Transaction",
       SENT: "Sent",
       RECEIVED: "Received",
       UNKNOWN: "Unknown",

@@ -6,8 +6,8 @@
       <div class="mx-5 sm:mx-10">
         Here, you can search for Morpheus DID documents at a given height. If you don't provide a height, the result will contain
         the current state of the document.
-        <div class="flex w-full justify-between mt-5">
-          <div class="w-2/5 mb-4 lg:mb-0">
+        <div class="sm:flex w-full justify-between mt-5">
+          <div class="sm:w-2/5 mb-4 lg:mb-0">
             <InputText
               :label="$t('PAGES.MORPHEUS_BROWSER.SEARCH.DID_INPUT')"
               name="did"
@@ -16,14 +16,14 @@
               @input="onDidChange"
             />
           </div>
-          <div class="w-1/5 lg:w-64 mb-4 lg:mb-0">
+          <div class="sm:w-1/5 lg:w-64 mb-4 lg:mb-0">
             <InputNumber
               :label="$t('PAGES.MORPHEUS_BROWSER.SEARCH.AT_HEIGHT_INPUT')"
               name="at-height"
               @input="onHeightChange"
             />
           </div>
-          <div class="w-1/5 lg:w-64 mb-4 lg:mb-0 text-right">
+          <div class="sm:w-1/5 sm:flex-row lg:w-64 mb-4 lg:mb-0 text-right">
             <button class="button-lg h-full w-full" @click="onSearchClick">Search</button>
           </div>
         </div>
@@ -33,8 +33,8 @@
       </div>
     </section>
 
-    <section v-if="didDocument" class="mb-5 bg-theme-feature-background xl:rounded-lg flex flex-col md:flex-row items-center px-5 sm:px-10 py-8">
-      <div class="flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
+    <section v-if="didDocument" class="mb-5 bg-theme-feature-background xl:rounded-lg flex flex-col md:flex-row items-center px-5 sm:px-10 pt-5 sm:py-8">
+      <div class="sm:flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
         <div class="flex-auto min-w-0">
           <div class="text-grey mb-2">
             DID
@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <div class="flex w-full md:block md:w-auto justify-between whitespace-no-wrap">
+        <div class="sm:flex sm:w-full sm:pt-0 pt-5 md:block md:w-auto justify-between whitespace-no-wrap">
           <div class="flex-auto min-w-0 mb-2 text-grey">
             <span>At Height:</span>
             <span class="semibold">
@@ -122,8 +122,10 @@
             {{ showNullableText(data.row.validUntilHeight) }}
           </div>
           <div v-if="data.column.field === 'valid'">
-            <span v-if="data.row.valid" class="text-green">YES</span>
-            <span v-else class="text-red">NO</span>
+            <strong>
+              <SvgIcon v-if="data.row.valid" name="forging" class="text-green ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-else name="cross" class="text-red ml-2" view-box="0 0 12 12" style="display: inline;" />
+            </strong>
           </div>
         </template>
       </TableWrapper>
@@ -142,8 +144,10 @@
             {{ data.row.keyLink }}
           </div>
           <div v-if="data.column.field === 'valid'">
-            <span v-if="data.row.valid" class="text-green">YES</span>
-            <span v-else class="text-red">NO</span>
+            <strong>
+              <SvgIcon v-if="data.row.valid" name="forging" class="text-green ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-else name="cross" class="text-red ml-2" view-box="0 0 12 12" style="display: inline;" />
+            </strong>
           </div>
         </template>
       </TableWrapper>
@@ -240,7 +244,11 @@ export default class MorpheusBrowserPage extends Vue {
       for(const right of ALL_RIGHTS) {
         const rightHistories: IKeyRightHistory[] = this.didDocument.rights[right];
         for(const history of rightHistories) {
-          if(history.keyLink.startsWith('#') && parseInt(history.keyLink.substring(1), 10) === key.index) {
+          if(
+            history.keyLink.startsWith('#') && 
+            parseInt(history.keyLink.substring(1), 10) === key.index &&
+            history.valid
+          ) {
             keyRights.push(right);
           }
         }

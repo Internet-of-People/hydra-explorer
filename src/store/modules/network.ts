@@ -10,7 +10,7 @@ const state: INetworkState = {
   nethash: null,
   alias: null,
   addressPrefix: 23,
-  activeDelegates: 51,
+  activeDelegates: 53,
   rewardOffset: 51,
   token: null,
   isListed: false,

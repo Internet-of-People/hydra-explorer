@@ -1,17 +1,34 @@
 <template>
   <div>
-    <section v-if="isMorpheusTransaction(transaction.type, transaction.typeGroup)" class="page-section py-5 md:py-5 px-10 mb-5">
+    <section v-if="isMorpheusTransaction(transaction.type, transaction.typeGroup)" class="page-section py-5 md:py-5 px-5 sm:px-10 mb-5">
       <div class="flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
         <div class="flex-auto min-w-0">
           <div class="text-xl">
             Morpheus Transaction (Layer 2)
+            <div class="sm:hidden mt-5">
+              <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED" class="text-green">
+                <SvgIcon name="forging" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> CONFIRMED
+              </strong>
+              <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED" class="text-red">
+                <SvgIcon name="cross" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> REJECTED
+              </strong>
+              <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND" class="text-orange">
+                <SvgIcon name="circle-o" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> PENDING
+              </strong>
+            </div>
           </div>
         </div>
         <div class="flex w-full md:block md:w-auto justify-between mb-5 md:mb-0 whitespace-no-wrap">
-          <div class="flex text-xl semibold">
-            <div class="text-green" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED">Confirmed</div>
-            <div class="text-red" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED">Rejected</div>
-            <div class="text-orange" v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND">Not yet confirmed</div>
+          <div class="flex text-xl semibold hidden sm:block">
+            <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED" class="text-green">
+              <SvgIcon name="forging" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> CONFIRMED
+            </strong>
+            <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED" class="text-red">
+              <SvgIcon name="cross" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> REJECTED
+            </strong>
+            <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND" class="text-orange">
+              <SvgIcon name="circle-o" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> PENDING
+            </strong>
           </div>
         </div>
       </div>
