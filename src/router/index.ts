@@ -25,7 +25,7 @@ const TopWalletsComponent = () => import(/* webpackChunkName: "top-wallets" */ "
 const BusinessesComponent = () => import(/* webpackChunkName: "businesses" */ "@/pages/Businesses.vue");
 const BridgechainsComponent = () => import(/* webpackChunkName: "bridgechains" */ "@/pages/Bridgechains.vue");
 const AdvancedSearchComponent = () => import(/* webpackChunkName: "search" */ "@/pages/AdvancedSearch.vue");
-const MorpheusBrowserComponent = () => import(/* webpackChunkName: "morpheus-browser" */ "@/pages/MorpheusBrowser.vue");
+const DidBrowserComponent = () => import(/* webpackChunkName: "morpheus-browser" */ "@/pages/DidBrowser.vue");
 const DelegateComponent = () => import(/* webpackChunkName: "delegates" */ "@/pages/Delegates.vue");
 const NotFoundComponent = () => import(/* webpackChunkName: "404" */ "@/pages/404.vue");
 
@@ -200,15 +200,23 @@ const router = new Router({
     },
     {
       path: "/morpheus-browser",
-      name: "morpheus-browser",
-      component: MorpheusBrowserComponent,
-      meta: { title: (route: Route) => getTitle("Morpheus Browser") },
+      redirect: "/did-browser",
     },
     {
       path: "/morpheus-browser/:did",
-      name: "morpheus-browser-did",
-      component: MorpheusBrowserComponent,
-      meta: { title: (route: Route) => getTitle("Morpheus Browser") },
+      redirect: "/did-browser/:did",
+    },
+    {
+      path: "/did-browser",
+      name: "did-browser",
+      component: DidBrowserComponent,
+      meta: { title: (route: Route) => getTitle("DAC DID Browser") },
+    },
+    {
+      path: "/did-browser/:did",
+      name: "did-browser-did",
+      component: DidBrowserComponent,
+      meta: { title: (route: Route) => getTitle("DAC DID Browser") },
     },
     {
       path: "/delegates/resigned",

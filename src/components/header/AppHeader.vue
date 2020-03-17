@@ -63,7 +63,7 @@ import {
       }
 
       entries.push({ name: "advanced-search", params: { page: 1 } });
-      entries.push({ name: "morpheus-browser" });
+      entries.push({ name: "did-browser" });
 
       return entries;
     },

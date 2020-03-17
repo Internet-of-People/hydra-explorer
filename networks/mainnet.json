@@ -1,6 +1,6 @@
 {
   "title": "HYD Explorer",
-  "server": "http://35.195.150.223:4703/api",
+  "server": "http://35.195.150.223:4703/api/v2",
   "alias": "Main",
   "activeDelegates": 53,
   "rewardOffset": 201600,

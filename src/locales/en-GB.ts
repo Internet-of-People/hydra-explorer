@@ -108,7 +108,7 @@ export default {
       BRIDGECHAIN_REGISTRATION: "Bridgechain Registration",
       BRIDGECHAIN_RESIGNATION: "Bridgechain Resignation",
       BRIDGECHAIN_UPDATE: "Bridgechain Update",
-      MORPHEUS_TRANSACTION: "Morpheus Transaction",
+      MORPHEUS_TRANSACTION: "DAC Transaction",
       SENT: "Sent",
       RECEIVED: "Received",
       UNKNOWN: "Unknown",
@@ -263,11 +263,21 @@ export default {
         BALANCE_TO: "Balance to",
       },
     },
-    MORPHEUS_BROWSER: {
-      TITLE: "Morpheus Browser",
+    DID_BROWSER: {
+      TITLE: "DAC DID Browser",
       SEARCH: {
+        DESCRIPTION: "Here, you can search for DID documents at a given height. If you don't provide a height, the result will contain the current state of the document.",
         DID_INPUT: "DID, eg.: did:morpheus:ezbeWGSY2dqcUBqT8K7R14xr",
-        AT_HEIGHT_INPUT: "At Height, eg.: 4242"
+        AT_HEIGHT_INPUT: "At Height, eg.: 4242",
+        ERROR: "Invalid DID format"
+      },
+      TABLE: {
+        DID_COL_HEADER: "DID",
+        HEIGHT_COL_HEADER: "At Height:",
+        TOMBSTONED_COL_HEADER: "Tombstoned:",
+        TOMBSTONED_YES: "YES, ",
+        TOMBSTONED_NO: "NO",
+        TOMBSTONED_HEIGHT: "at height {0}"
       }
     },
     NOT_FOUND: {

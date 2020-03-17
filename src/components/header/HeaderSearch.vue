@@ -80,7 +80,7 @@ export default class HeaderSearch extends Vue {
     this.query = this.query.trim();
 
     if(this.query.startsWith('did:morpheus')) {
-      this.$router.push(`/morpheus-browser/${this.query}`);
+      this.$router.push(`/did-browser/${this.query}`);
       return;
     }
 

@@ -4,7 +4,7 @@
       <div class="flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
         <div class="flex-auto min-w-0">
           <div class="text-xl">
-            Morpheus Transaction (Layer 2)
+            {{ $t("TRANSACTION.TYPES.MORPHEUS_TRANSACTION") }}
             <div class="sm:hidden mt-5">
               <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED" class="text-green">
                 <SvgIcon name="forging" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> CONFIRMED
@@ -62,7 +62,7 @@
             :key="did"
           >
             <div class="my-2">
-              <RouterLink :to="`/morpheus-browser/${did}`">{{ did }}</RouterLink>
+              <RouterLink :to="`/did-browser/${did}`">{{ did }}</RouterLink>
             </div>
             <ul>
               <li

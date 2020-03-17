@@ -36,7 +36,7 @@
             :show-timelock-icon="true"
           />
           <div v-else v-tooltip="`${MorpheusTxStatus[morpheusTxProvider.get(data.row.id)]}`">
-            Morpheus Transaction
+            {{ $t("TRANSACTION.TYPES.MORPHEUS_TRANSACTION") }}
             <strong>
               <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.CONFIRMED" name="forging" class="text-green ml-2" view-box="0 0 12 12" style="display: inline;" />
               <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.REJECTED" name="cross" class="text-red ml-2" view-box="0 0 12 12" style="display: inline;" />

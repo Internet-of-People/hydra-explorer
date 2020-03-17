@@ -1,6 +1,6 @@
 {
   "title": "DHYD Explorer",
-  "server": "http://dev.hydra.iop.global:4703/api",
+  "server": "http://dev.hydra.iop.global:4703/api/v2",
   "alias": "Development",
   "activeDelegates": 53,
   "rewardOffset": 50400,

@@ -49,6 +49,6 @@ export class MorpheusAPI {
   }
 
   private static getBaseUrl(): string {
-    return store.getters["network/server"].replace("/api","");
+    return store.getters["network/server"].replace("/api/v2","/morpheus/v1");
   }
 }

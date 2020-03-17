@@ -1,6 +1,6 @@
 {
   "title": "THYD Explorer",
-  "server": "http://test.hydra.iop.global:4703/api",
+  "server": "http://test.hydra.iop.global:4703/api/v2",
   "alias": "Test",
   "activeDelegates": 53,
   "rewardOffset": 7200,

@@ -1,15 +1,14 @@
 <template>
   <div class="max-w-2xl mx-auto md:pt-5">
-    <ContentHeader>{{ $t("PAGES.MORPHEUS_BROWSER.TITLE") }}</ContentHeader>
+    <ContentHeader>{{ $t("PAGES.DID_BROWSER.TITLE") }}</ContentHeader>
 
     <section class="page-section mb-5 py-5 md:py-10">
       <div class="mx-5 sm:mx-10">
-        Here, you can search for Morpheus DID documents at a given height. If you don't provide a height, the result will contain
-        the current state of the document.
+        {{ $t('PAGES.DID_BROWSER.SEARCH.DESCRIPTION') }}
         <div class="sm:flex w-full justify-between mt-5">
           <div class="sm:w-2/5 mb-4 lg:mb-0">
             <InputText
-              :label="$t('PAGES.MORPHEUS_BROWSER.SEARCH.DID_INPUT')"
+              :label="$t('PAGES.DID_BROWSER.SEARCH.DID_INPUT')"
               name="did"
               class="pt-0"
               :value="did"
@@ -18,7 +17,7 @@
           </div>
           <div class="sm:w-1/5 lg:w-64 mb-4 lg:mb-0">
             <InputNumber
-              :label="$t('PAGES.MORPHEUS_BROWSER.SEARCH.AT_HEIGHT_INPUT')"
+              :label="$t('PAGES.DID_BROWSER.SEARCH.AT_HEIGHT_INPUT')"
               name="at-height"
               @input="onHeightChange"
             />
@@ -28,7 +27,7 @@
           </div>
         </div>
         <div v-if="error" class="mt-10 text-red text-center semibold">
-          Invalid DID format
+          {{ $t("PAGES.DID_BROWSER.SEARCH.ERROR") }}
         </div>
       </div>
     </section>
@@ -37,7 +36,7 @@
       <div class="sm:flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
         <div class="flex-auto min-w-0">
           <div class="text-grey mb-2">
-            DID
+            {{ $t("PAGES.DID_BROWSER.TABLE.DID_COL_HEADER") }}
           </div>
           <div class="flex">
             <div class="text-xl text-white semibold truncate">
@@ -50,16 +49,16 @@
 
         <div class="sm:flex sm:w-full sm:pt-0 pt-5 md:block md:w-auto justify-between whitespace-no-wrap">
           <div class="flex-auto min-w-0 mb-2 text-grey">
-            <span>At Height:</span>
+            <span>{{ $t("PAGES.DID_BROWSER.TABLE.HEIGHT_COL_HEADER") }}</span>
             <span class="semibold">
               {{ didDocument.queriedAtHeight }}
             </span>
           </div>
           <div class="flex text-xl text-white">
-            <span class="mr-1">Tombstoned:</span>
-            <span :class="`semibold text-${(didDocument.tombstoned)?'red':'green'}`">
-              {{ (didDocument.tombstoned)?'YES,':'NO' }}
-              <span v-if="didDocument.tombstoned"> at height {{ didDocument.tombstonedAtHeight }}</span>
+            <span class="mr-1">{{ $t("PAGES.DID_BROWSER.TABLE.TOMBSTONED_COL_HEADER") }}</span>
+            <span :class="`semibold text-${(didDocument.tombstoned) ? 'red' : 'green'}`">
+              {{ $t("PAGES.DID_BROWSER.TABLE." + (didDocument.tombstoned ? "TOMBSTONED_YES" : "TOMBSTONED_NO")) }}
+              <span v-if="didDocument.tombstoned">{{ $t("PAGES.DID_BROWSER.TABLE.TOMBSTONED_HEIGHT", [didDocument.tombstonedAtHeight]) }}</span>
             </span>
           </div>
         </div>
@@ -416,7 +415,7 @@ export default class MorpheusBrowserPage extends Vue {
   }
 
   private onSearchClick(): void {
-    const path = `/morpheus-browser/${this.did}`;
+    const path = `/did-browser/${this.did}`;
     if(this.did) {
       if(this.$route.path !== path) {
         this.$router.push(path);
