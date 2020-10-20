@@ -189,9 +189,9 @@
 import { Component, Vue } from "vue-property-decorator";
 import { Route } from "vue-router";
 import { InputText, InputNumber } from "../components/search/input";
-import { MorpheusAPI } from "../morpheus/api";
-import { IDidDocumentData, ALL_RIGHTS, IKeyRightHistory, IOperationData, DidOperation } from '../morpheus/interfaces';
-import { formatMorpheusSignableOperation } from '../morpheus/utils';
+import { MorpheusAPI } from "../iop/morpheus-api";
+import { IDidDocumentData, ALL_RIGHTS, IKeyRightHistory, IOperationData, DidOperation } from '../iop/interfaces';
+import { formatMorpheusSignableOperation } from '../iop/utils';
 
 Component.registerHooks(["beforeRouteEnter"]);
 

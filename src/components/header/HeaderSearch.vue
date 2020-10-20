@@ -84,6 +84,11 @@ export default class HeaderSearch extends Vue {
       return;
     }
 
+    if(this.query.startsWith('.schema')) { // TODO: later as we introduce more tld, we have to extend this
+      this.$router.push(`/dns-browser/${this.query}`);
+      return;
+    }
+
     const address = this.findByNameInKnownWallets(this.query);
     if (address) {
       this.changePage("wallet", { address });

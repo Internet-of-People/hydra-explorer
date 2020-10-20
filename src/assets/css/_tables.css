@@ -42,7 +42,7 @@
   background-color: var(--color-theme-table-row);
 }
 
-.vgt-table tbody tr:hover {
+.vgt-table tbody tr:hover:not(.donttransform) {
   background-color: var(--color-theme-table-row-hover);
   transform: scale(1.015);
   box-shadow: var(--theme-table-hover-shadow);

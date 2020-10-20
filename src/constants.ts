@@ -9,6 +9,11 @@ export const transactionTypes: ITransactionType[] = [
     type: 1,
     typeGroup: 4242,
   },
+  {
+    key: "COEUS_TRANSACTION",
+    type: 2,
+    typeGroup: 4242,
+  },
   { key: "SECOND_SIGNATURE", type: CoreTransaction.SECOND_SIGNATURE, typeGroup: TypeGroupTransaction.CORE },
   { key: "DELEGATE_REGISTRATION", type: CoreTransaction.DELEGATE_REGISTRATION, typeGroup: TypeGroupTransaction.CORE },
   { key: "VOTE", type: CoreTransaction.VOTE, typeGroup: TypeGroupTransaction.CORE },

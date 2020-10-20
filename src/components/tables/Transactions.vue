@@ -28,19 +28,27 @@
 
         <div v-else-if="data.column.field === 'recipient'">
           <LinkWallet
-            v-if="!isMorpheusTransaction(data.row.type, data.row.typeGroup)"
+            v-if="!isIOPTransaction(data.row.typeGroup)"
             :address="data.row.recipient"
             :type="data.row.type"
             :asset="data.row.asset"
             :type-group="data.row.typeGroup"
             :show-timelock-icon="true"
           />
-          <div v-else v-tooltip="`${MorpheusTxStatus[morpheusTxProvider.get(data.row.id)]}`">
+          <div v-if="isMorpheusTransaction(data.row.type, data.row.typeGroup)" v-tooltip="`${TxStatus[morpheusTxProvider.get(data.row.id)]}`">
             {{ $t("TRANSACTION.TYPES.MORPHEUS_TRANSACTION") }}
             <strong>
-              <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.CONFIRMED" name="forging" class="text-green ml-2" view-box="0 0 12 12" style="display: inline;" />
-              <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.REJECTED" name="cross" class="text-red ml-2" view-box="0 0 12 12" style="display: inline;" />
-              <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===MorpheusTxStatus.NOT_FOUND" name="circle-o" class="text-orange ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===TxStatus.CONFIRMED" name="forging" class="text-green ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===TxStatus.REJECTED" name="cross" class="text-red ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-if="morpheusTxProvider.get(data.row.id)===TxStatus.NOT_FOUND" name="circle-o" class="text-orange ml-2" view-box="0 0 12 12" style="display: inline;" />
+            </strong>
+          </div>
+          <div v-if="isCoeusTransaction(data.row.type, data.row.typeGroup)">
+            {{ $t("TRANSACTION.TYPES.COEUS_TRANSACTION") }}
+            <strong>
+              <SvgIcon v-if="coeusTxProvider.get(data.row.id)===TxStatus.CONFIRMED" name="forging" class="text-green ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-if="coeusTxProvider.get(data.row.id)===TxStatus.REJECTED" name="cross" class="text-red ml-2" view-box="0 0 12 12" style="display: inline;" />
+              <SvgIcon v-if="coeusTxProvider.get(data.row.id)===TxStatus.NOT_FOUND" name="circle-o" class="text-orange ml-2" view-box="0 0 12 12" style="display: inline;" />
             </strong>
           </div>
         </div>
@@ -85,10 +93,9 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { mapGetters } from "vuex";
 import { IDelegate, ISortParameters, ITransaction } from "@/interfaces";
 // import CryptoCompareService from "@/services/crypto-compare";
-import { IMorpheusAsset, OperationType, ISignedOperationsData } from "@/morpheus/interfaces";
-import { isMorpheusTransaction } from "@/morpheus/utils";
-import { morpheusTxProvider } from "@/morpheus/tx-status";
-import { MorpheusTxStatus } from "@/morpheus/api";
+import { IMorpheusAsset, OperationType, ISignedOperationsData, TxStatus } from "@/iop/interfaces";
+import { isCoeusTransaction, isMorpheusTransaction, isIOPTransaction } from "@/iop/utils";
+import { morpheusTxProvider, coeusTxProvider } from "@/iop/tx-status";
 
 @Component({
   computed: {
@@ -96,7 +103,7 @@ import { MorpheusTxStatus } from "@/morpheus/api";
     ...mapGetters("currency", { currencySymbol: "symbol" }),
   },
   data: () => {
-    return { isMorpheusTransaction, morpheusTxProvider, MorpheusTxStatus };
+    return { isCoeusTransaction, isMorpheusTransaction, isIOPTransaction, morpheusTxProvider, coeusTxProvider, TxStatus };
   },
 })
 export default class TableTransactionsDesktop extends Vue {
@@ -190,7 +197,7 @@ export default class TableTransactionsDesktop extends Vue {
   @Watch("transactions")
   public async onTransactionsChanged() {
     await this.prepareTransactions();
-    await this.updateMorpheusTxStatuses();
+    await this.updateLayer2TxStatuses();
   }
 
   @Watch("currencySymbol")
@@ -200,23 +207,33 @@ export default class TableTransactionsDesktop extends Vue {
 
   public async created() {
     this.prepareTransactions();
-    await this.updateMorpheusTxStatuses();
+    await this.updateLayer2TxStatuses();
   }
 
-  private async updateMorpheusTxStatuses(): Promise<void> {
+  private async updateLayer2TxStatuses(): Promise<void> {
     if(!this.transactions) {
       return;
     }
+
     const morpheusTxs = [];
+    const coeusTxs = [];
+
     for(const tx of this.transactions) {
-      if(!isMorpheusTransaction(tx.type, tx.typeGroup)) {
+      if(isMorpheusTransaction(tx.type, tx.typeGroup)) {
+        morpheusTxs.push(tx.id);  
+      }
+      else if(isCoeusTransaction(tx.type, tx.typeGroup)) {
+        coeusTxs.push(tx.id);
+      }
+      else {
         continue;
       }
-
-      morpheusTxs.push(tx.id);
     }
 
-    await morpheusTxProvider.load(morpheusTxs);
+    await Promise.all([
+      morpheusTxProvider.load(morpheusTxs),
+      coeusTxProvider.load(coeusTxs),
+    ]);
   }
 
   private async prepareTransactions() {

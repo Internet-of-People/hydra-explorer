@@ -64,6 +64,7 @@ import {
 
       entries.push({ name: "advanced-search", params: { page: 1 } });
       entries.push({ name: "did-browser" });
+      entries.push({ name: "dns-browser" });
 
       return entries;
     },

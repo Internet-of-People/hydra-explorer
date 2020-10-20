@@ -10,10 +10,10 @@ import {
   IRevokeKeyData,
   IRevokeRightData,
   IRegisterBeforeProofData,
+  TxStatus,
 } from "./interfaces";
 
 export class OperationDetails {
-
   constructor(
     public readonly didOperations: Map<string,string[]>,
     public readonly otherOperations: string[]
@@ -126,9 +126,37 @@ export const isMorpheusTransaction = (type: number, typeGroup: number): boolean 
   return typeGroup === 4242 && type === 1;
 };
 
+export const isCoeusTransaction = (type: number, typeGroup: number): boolean => {
+  return typeGroup === 4242 && type === 2;
+};
+
+export const isIOPTransaction = (typeGroup: number): boolean => {
+  return typeGroup === 4242;
+};
+
 const formatUndefined = (value: string | number | undefined) => {
   if(!value) {
     return '-';
   }
   return value;
-}
+};
+
+export const buildTxStatusesMap = (txs: string[], results: any[]): Map<string,TxStatus> => {
+  const map = new Map<string, TxStatus>();
+    for(let i=0;i<txs.length;i++){
+      const txId = txs[i];
+
+      for(const result of results) {
+        if(result.config && result.config.url.endsWith(txId)) {
+          map.set(txId, result.data ? TxStatus.CONFIRMED : TxStatus.REJECTED);
+          break;
+        }
+      }
+
+      if(!map.has(txId)) {
+        map.set(txId,TxStatus.NOT_FOUND);
+      }
+    }
+
+    return map;
+};

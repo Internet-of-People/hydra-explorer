@@ -1,3 +1,79 @@
+export enum TxStatus {
+  CONFIRMED,
+  REJECTED,
+  NOT_FOUND
+}
+
+export interface ICoeusDomainData {
+  data: string;
+}
+
+export interface ICoeusDomainSubtreePolicies {
+  expiration: number;
+}
+
+export interface ICoeusDomainMeta {
+  owner: string;
+  subtreePolicies: ICoeusDomainSubtreePolicies;
+  registrationPolicy: string;
+  expiresAtHeight: number;
+}
+
+export interface ICoeusDomainChildren {
+  children: string[];
+}
+
+export type Principal = string;
+
+export interface IUserOperation {
+  type: 'register'|'update'|'renew'|'transfer'|'delete';
+  name: string;
+}
+
+export interface ISubtreePolicies {
+  expiration?: { maxExpiry: number; };
+  schema?: { schema: unknown; };
+}
+
+export interface IRegisterOperation extends IUserOperation {
+  type: 'register';
+  owner: Principal;
+  subtreePolicies: ISubtreePolicies;
+  registrationPolicy: 'owner' | 'any';
+  data: unknown;
+  expiresAtHeight: number;
+}
+
+export interface IUpdateOperation extends IUserOperation {
+  type: 'update';
+  data: unknown;
+}
+
+export interface IRenewOperation extends IUserOperation {
+  type: 'renew';
+  expiresAtHeight: number;
+}
+
+export interface ITransferOperation extends IUserOperation {
+  type: 'transfer';
+  toOwner: Principal;
+}
+
+export interface IDeleteOperation extends IUserOperation {
+  type: 'delete';
+}
+
+export interface ISignedBundle {
+  operations: IUserOperation[];
+  nonce: number;
+  publicKey: string;
+  signature: string;
+}
+
+export interface ICoeusAsset {
+  bundles: ISignedBundle[];
+}
+
 export interface IMorpheusAsset {
   operationAttempts: IOperationData[];
 }

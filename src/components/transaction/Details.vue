@@ -6,13 +6,13 @@
           <div class="text-xl">
             {{ $t("TRANSACTION.TYPES.MORPHEUS_TRANSACTION") }}
             <div class="sm:hidden mt-5">
-              <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED" class="text-green">
+              <strong v-if="morpheusTxProvider.get(transaction.id)===TxStatus.CONFIRMED" class="text-green">
                 <SvgIcon name="forging" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> CONFIRMED
               </strong>
-              <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED" class="text-red">
+              <strong v-if="morpheusTxProvider.get(transaction.id)===TxStatus.REJECTED" class="text-red">
                 <SvgIcon name="cross" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> REJECTED
               </strong>
-              <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND" class="text-orange">
+              <strong v-if="morpheusTxProvider.get(transaction.id)===TxStatus.NOT_FOUND" class="text-orange">
                 <SvgIcon name="circle-o" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> PENDING
               </strong>
             </div>
@@ -20,13 +20,13 @@
         </div>
         <div class="flex w-full md:block md:w-auto justify-between mb-5 md:mb-0 whitespace-no-wrap">
           <div class="flex text-xl semibold hidden sm:block">
-            <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.CONFIRMED" class="text-green">
+            <strong v-if="morpheusTxProvider.get(transaction.id)===TxStatus.CONFIRMED" class="text-green">
               <SvgIcon name="forging" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> CONFIRMED
             </strong>
-            <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.REJECTED" class="text-red">
+            <strong v-if="morpheusTxProvider.get(transaction.id)===TxStatus.REJECTED" class="text-red">
               <SvgIcon name="cross" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> REJECTED
             </strong>
-            <strong v-if="morpheusTxProvider.get(transaction.id)===MorpheusTxStatus.NOT_FOUND" class="text-orange">
+            <strong v-if="morpheusTxProvider.get(transaction.id)===TxStatus.NOT_FOUND" class="text-orange">
               <SvgIcon name="circle-o" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> PENDING
             </strong>
           </div>
@@ -90,7 +90,51 @@
       </div>
     </section>
 
+    <section v-if="isCoeusTransaction(transaction.type, transaction.typeGroup)" class="page-section py-5 md:py-5 px-5 sm:px-10 mb-5">
+      <div class="flex items-center flex-auto w-full md:w-auto mb-5 md:mb-0 truncate">
+        <div class="flex-auto min-w-0">
+          <div class="text-xl">
+            {{ $t("TRANSACTION.TYPES.COEUS_TRANSACTION") }}
+            <div class="sm:hidden mt-5">
+              <strong v-if="coeusTxProvider.get(transaction.id)===TxStatus.CONFIRMED" class="text-green">
+                <SvgIcon name="forging" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> CONFIRMED
+              </strong>
+              <strong v-if="coeusTxProvider.get(transaction.id)===TxStatus.REJECTED" class="text-red">
+                <SvgIcon name="cross" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> REJECTED
+              </strong>
+              <strong v-if="coeusTxProvider.get(transaction.id)===TxStatus.NOT_FOUND" class="text-orange">
+                <SvgIcon name="circle-o" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> PENDING
+              </strong>
+            </div>
+          </div>
+        </div>
+        <div class="flex w-full md:block md:w-auto justify-between mb-5 md:mb-0 whitespace-no-wrap">
+          <div class="flex text-xl semibold hidden sm:block">
+            <strong v-if="coeusTxProvider.get(transaction.id)===TxStatus.CONFIRMED" class="text-green">
+              <SvgIcon name="forging" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> CONFIRMED
+            </strong>
+            <strong v-if="coeusTxProvider.get(transaction.id)===TxStatus.REJECTED" class="text-red">
+              <SvgIcon name="cross" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> REJECTED
+            </strong>
+            <strong v-if="coeusTxProvider.get(transaction.id)===TxStatus.NOT_FOUND" class="text-orange">
+              <SvgIcon name="circle-o" class="ml-2 mr-2" view-box="0 0 22 22" style="display: inline;" /> PENDING
+            </strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <CoeusSignedOperations
+      class="mt-5"
+      :key="bundle.signature"
+      v-for="bundle in coeusTxBundles"
+      :bundle="bundle"
+    />
+
     <section class="page-section py-5 md:py-10 mb-5">
+      <div v-if="isIOPTransaction(transaction.typeGroup)" class="px-5 sm:px-10 text-xl mb-8">
+        Core Transaction Information
+      </div>
       <div class="px-5 sm:px-10">
         <div class="list-row-border-b">
           <div class="mr-4">{{ $t("TRANSACTION.SENDER") }}</div>
@@ -315,13 +359,20 @@ import { TranslateResult } from "vue-i18n";
 import { mapGetters } from "vuex";
 import { ITransaction } from "@/interfaces";
 import { CoreTransaction, MagistrateTransaction, TypeGroupTransaction } from "@/enums";
+import { CoeusSignedOperations } from "@/components/iop";
 import {
   LockService,
   TransactionService,
 } from "@/services";
-import { formatMorpheusOperations, isMorpheusTransaction, OperationDetails } from "@/morpheus/utils";
-import { morpheusTxProvider } from "@/morpheus/tx-status";
-import { MorpheusTxStatus } from "@/morpheus/api";
+import {
+  formatMorpheusOperations,
+  isMorpheusTransaction,
+  isCoeusTransaction,
+  isIOPTransaction,
+  OperationDetails,
+} from "@/iop/utils";
+import { morpheusTxProvider, coeusTxProvider } from "@/iop/tx-status";
+import { ICoeusAsset, TxStatus } from '@/iop/interfaces';
 
 @Component({
   computed: {
@@ -329,8 +380,19 @@ import { MorpheusTxStatus } from "@/morpheus/api";
     ...mapGetters("network", ["height"]),
   },
   data: () => {
-    return { isMorpheusTransaction, formatMorpheusOperations, morpheusTxProvider, MorpheusTxStatus };
+    return {
+      isMorpheusTransaction,
+      isCoeusTransaction,
+      isIOPTransaction,
+      formatMorpheusOperations,
+      morpheusTxProvider,
+      coeusTxProvider,
+      TxStatus,
+    };
   },
+  components: {
+    CoeusSignedOperations,
+  }
 })
 export default class TransactionDetails extends Vue {
   @Prop({ required: true }) public transaction: ITransaction;
@@ -346,6 +408,16 @@ export default class TransactionDetails extends Vue {
 
   get isDidOperationsTabActive() {
     return this.tabActive === "didOperations";
+  }
+
+  get coeusTxBundles() {
+    if(!isCoeusTransaction(this.transaction.type, this.transaction.typeGroup)) {
+      return;
+    }
+
+    console.log(this.coeusAsset.bundles);
+
+    return this.coeusAsset.bundles;
   }
 
   get isOtherOperationsTabActive() {
@@ -403,6 +475,10 @@ export default class TransactionDetails extends Vue {
     return formatMorpheusOperations(this.transaction.asset);
   }
 
+  get coeusAsset(): ICoeusAsset {
+    return this.transaction.asset as ICoeusAsset;
+  }
+
   private setActiveTab(active: string) {
     this.tabActive = active;
   }
@@ -413,7 +489,7 @@ export default class TransactionDetails extends Vue {
     this.handleMultipayment();
     this.getTimelockStatus();
     this.setInitialBlockHeight();
-    await this.updateMorpheusTxStatuses();
+    await this.updateLayer2TxStatus();
   }
 
   @Watch("currencySymbol")
@@ -432,15 +508,16 @@ export default class TransactionDetails extends Vue {
     this.updatePrice();
     this.handleMultipayment();
     this.getTimelockStatus();
-    await this.updateMorpheusTxStatuses();
+    await this.updateLayer2TxStatus();
   }
 
-  private async updateMorpheusTxStatuses(): Promise<void> {
-    if(!isMorpheusTransaction(this.transaction.type, this.transaction.typeGroup)) {
-      return;
+  private async updateLayer2TxStatus(): Promise<void> {
+    if(isMorpheusTransaction(this.transaction.type, this.transaction.typeGroup)) {
+      await morpheusTxProvider.load([this.transaction.id]);
     }
-
-    await morpheusTxProvider.load([this.transaction.id]);
+    else if(isCoeusTransaction(this.transaction.type, this.transaction.typeGroup)) {
+      await coeusTxProvider.load([this.transaction.id]);
+    }
   }
 
   private async updatePrice() {

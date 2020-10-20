@@ -28,6 +28,8 @@
 
     <span v-else-if="isSecondSignature(type, typeGroup)">{{ $t("TRANSACTION.TYPES.SECOND_SIGNATURE") }}</span>
     <span v-else-if="isDelegateRegistration(type, typeGroup)">{{ $t("TRANSACTION.TYPES.DELEGATE_REGISTRATION") }}</span>
+    <span v-else-if="isCoeusTransaction(type, typeGroup)">{{ $t("TRANSACTION.TYPES.COEUS_TRANSACTION") }}</span>
+    <span v-else-if="isMorpheusTransaction(type, typeGroup)">{{ $t("TRANSACTION.TYPES.MORPHEUS_TRANSACTION") }}</span>
     <span v-else-if="isVote(type, typeGroup)">
       <RouterLink
         v-if="votedDelegateAddress"
@@ -80,6 +82,7 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { mapGetters } from "vuex";
 import { IDelegate } from "@/interfaces";
 import LinkAddress from "./LinkAddress.vue";
+import { isCoeusTransaction, isMorpheusTransaction } from "@/iop/utils";
 
 @Component({
   components: {
@@ -87,6 +90,9 @@ import LinkAddress from "./LinkAddress.vue";
   },
   computed: {
     ...mapGetters("delegates", ["delegates"]),
+  },
+  data: () => {
+    return { isCoeusTransaction, isMorpheusTransaction };
   },
 })
 export default class LinkWallet extends Vue {

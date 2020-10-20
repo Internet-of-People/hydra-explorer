@@ -108,7 +108,8 @@ export default {
       BRIDGECHAIN_REGISTRATION: "Bridgechain Registration",
       BRIDGECHAIN_RESIGNATION: "Bridgechain Resignation",
       BRIDGECHAIN_UPDATE: "Bridgechain Update",
-      MORPHEUS_TRANSACTION: "DAC Transaction",
+      MORPHEUS_TRANSACTION: "SSI Transaction",
+      COEUS_TRANSACTION: "DNS Transaction",
       SENT: "Sent",
       RECEIVED: "Received",
       UNKNOWN: "Unknown",
@@ -166,7 +167,7 @@ export default {
   SEARCH: {
     PLACEHOLDER: {
       SHORT: "Search",
-      LONG: "Find a block, transaction, address, delegate or DID",
+      LONG: "Find a DID, domain, block, transaction, address or a delegate",
     },
     NO_RESULTS: "Nothing matched your search",
   },
@@ -264,7 +265,7 @@ export default {
       },
     },
     DID_BROWSER: {
-      TITLE: "DAC DID Browser",
+      TITLE: "SSI DID Browser",
       SEARCH: {
         DESCRIPTION: "Here, you can search for DID documents at a given height. If you don't provide a height, the result will contain the current state of the document.",
         DID_INPUT: "DID, eg.: did:morpheus:ezbeWGSY2dqcUBqT8K7R14xr",
@@ -278,6 +279,29 @@ export default {
         TOMBSTONED_YES: "YES, ",
         TOMBSTONED_NO: "NO",
         TOMBSTONED_HEIGHT: "at height {0}"
+      }
+    },
+    DNS_BROWSER: {
+      TITLE: "DNS Browser",
+      SEARCH: {
+        DESCRIPTION: "Here, you can search for domains that are registered in IOP DNS.",
+        DOMAIN_INPUT: "A domain, eg.: .schema.company.secuirty.protocol",
+        SEARCH_BUTTON: "Search",
+        DOMAIN_NOT_FOUND: "The domain you were looking for cannot be found."
+      },
+      TABLE: {
+        DOMAIN_COL_HEADER: "Domain",
+        EXPIRES_AT_HEIGHT_COL_HEADER: "Expires at Height:",
+        EXPIRED_COL_HEADER: "Expired:",
+        EXPIRED_YES: "YES",
+        EXPIRED_NO: "NO",
+        OWNER: "Owner",
+        REGISTRATION_POLICY: "Registration Policy",
+        EXPIRES_AT_HEIGHT: "Expires at Height",
+        EXPIRED: "Expired",
+        DIRECT_LINK: "Direct Link",
+        SUBDOMAINS: "Subdomains",
+        NO_SUBDOMAINS: "No subdomains registered."
       }
     },
     NOT_FOUND: {

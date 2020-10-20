@@ -1,33 +1,17 @@
 import axios from "axios";
 import store from "../store";
-import { IDidDocumentData, DidOperation } from './interfaces';
-
-export enum MorpheusTxStatus {
-  CONFIRMED,
-  REJECTED,
-  NOT_FOUND
-}
+import { IDidDocumentData, DidOperation, TxStatus } from './interfaces';
+import { buildTxStatusesMap } from './utils';
 
 export class MorpheusAPI {
-  public static async getTxStatus(txs: string[]): Promise<Map<string,MorpheusTxStatus>> {
+  public static async getTxStatus(txs: string[]): Promise<Map<string,TxStatus>> {
     const promises = [];
     for(const tx of txs) {
       const axiosPromise = axios.get(`${this.getBaseUrl()}/txn-status/${tx}`);
       promises.push(axiosPromise.catch(() => undefined)); // will prevent break of Promise.all if any of those fails
     }
     const result = await Promise.all(promises);
-    
-    const map = new Map<string, MorpheusTxStatus>();
-    for(let i=0;i<txs.length;i++){
-      if(result[i].data === undefined){
-        map.set(txs[i],MorpheusTxStatus.NOT_FOUND);
-      }
-      else {
-        map.set(txs[i],result[i].data ? MorpheusTxStatus.CONFIRMED : MorpheusTxStatus.REJECTED);  
-      }
-    }
-
-    return map;
+    return buildTxStatusesMap(txs, result);
   }
 
   public static async getDidDocument(did: string, atHeight?: number): Promise<IDidDocumentData> {

@@ -26,6 +26,7 @@ const BusinessesComponent = () => import(/* webpackChunkName: "businesses" */ "@
 const BridgechainsComponent = () => import(/* webpackChunkName: "bridgechains" */ "@/pages/Bridgechains.vue");
 const AdvancedSearchComponent = () => import(/* webpackChunkName: "search" */ "@/pages/AdvancedSearch.vue");
 const DidBrowserComponent = () => import(/* webpackChunkName: "morpheus-browser" */ "@/pages/DidBrowser.vue");
+const DNSBrowserComponent = () => import(/* webpackChunkName: "coeus-browser" */ "@/pages/DNSBrowser.vue");
 const DelegateComponent = () => import(/* webpackChunkName: "delegates" */ "@/pages/Delegates.vue");
 const NotFoundComponent = () => import(/* webpackChunkName: "404" */ "@/pages/404.vue");
 
@@ -210,13 +211,25 @@ const router = new Router({
       path: "/did-browser",
       name: "did-browser",
       component: DidBrowserComponent,
-      meta: { title: (route: Route) => getTitle("DAC DID Browser") },
+      meta: { title: (route: Route) => getTitle("SSI DID Browser") },
     },
     {
       path: "/did-browser/:did",
       name: "did-browser-did",
       component: DidBrowserComponent,
-      meta: { title: (route: Route) => getTitle("DAC DID Browser") },
+      meta: { title: (route: Route) => getTitle("SSI DID Browser") },
+    },
+    {
+      path: "/dns-browser",
+      name: "dns-browser",
+      component: DNSBrowserComponent,
+      meta: { title: (route: Route) => getTitle("DNS Browser") },
+    },
+    {
+      path: "/dns-browser/:domain",
+      name: "dns-browser-domain",
+      component: DNSBrowserComponent,
+      meta: { title: (route: Route) => getTitle("DNS Browser") },
     },
     {
       path: "/delegates/resigned",
