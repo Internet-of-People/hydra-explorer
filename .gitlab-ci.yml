@@ -1,0 +1,96 @@
+stages:
+  - build
+  - docker
+
+build_testnet:
+  stage: build
+  image: node:12
+  only:
+    - testnet
+  before_script:
+    - rm -rf dist
+  script:
+    - yarn --frozen-lockfile
+    - yarn build:testnet
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+      - dist/
+
+build_devnet:
+  stage: build
+  image: node:12
+  only:
+    - devnet
+  before_script:
+    - rm -rf dist
+  script:
+    - yarn --frozen-lockfile
+    - yarn build:devnet
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+      - dist/
+
+build_mainnet:
+  stage: build
+  image: node:12
+  only:
+    - mainnet
+  before_script:
+    - rm -rf dist
+  script:
+    - yarn --frozen-lockfile
+    - yarn build:mainnet
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+      - dist/
+
+build_docker_testnet:
+  stage: docker
+  image: docker:stable
+  only:
+    - testnet
+  before_script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo $CI_REGISTRY
+    - echo $CI_REGISTRY_IMAGE
+    - docker build -f docker/DockerFile -t $CI_REGISTRY_IMAGE:latest-testnet .
+    - docker push $CI_REGISTRY_IMAGE:latest-testnet
+
+build_docker_devnet:
+  stage: docker
+  image: docker:stable
+  only:
+    - devnet
+  before_script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo $CI_REGISTRY
+    - echo $CI_REGISTRY_IMAGE
+    - docker build -f docker/DockerFile -t $CI_REGISTRY_IMAGE:latest-devnet .
+    - docker push $CI_REGISTRY_IMAGE:latest-devnet
+
+build_docker_mainnet:
+  stage: docker
+  image: docker:stable
+  only:
+    - mainnet
+  before_script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo $CI_REGISTRY
+    - echo $CI_REGISTRY_IMAGE
+    - docker build -f docker/DockerFile -t $CI_REGISTRY_IMAGE:latest-mainnet .
+    - docker push $CI_REGISTRY_IMAGE:latest-mainnet
