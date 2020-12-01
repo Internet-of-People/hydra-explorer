@@ -126,6 +126,7 @@
 
     <CoeusSignedOperations
       class="mt-5"
+      :txId="transaction.id"
       :key="bundle.signature"
       v-for="bundle in coeusTxBundles"
       :bundle="bundle"

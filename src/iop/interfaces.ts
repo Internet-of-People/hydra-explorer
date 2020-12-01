@@ -35,18 +35,20 @@ export interface ISubtreePolicies {
   schema?: { schema: unknown; };
 }
 
-export interface IRegisterOperation extends IUserOperation {
+export interface IDataOperation extends IUserOperation {
+  data: unknown;
+}
+
+export interface IRegisterOperation extends IDataOperation {
   type: 'register';
   owner: Principal;
   subtreePolicies: ISubtreePolicies;
   registrationPolicy: 'owner' | 'any';
-  data: unknown;
   expiresAtHeight: number;
 }
 
-export interface IUpdateOperation extends IUserOperation {
+export interface IUpdateOperation extends IDataOperation {
   type: 'update';
-  data: unknown;
 }
 
 export interface IRenewOperation extends IUserOperation {

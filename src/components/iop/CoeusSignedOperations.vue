@@ -77,6 +77,8 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 @Component
 export default class CoeusSignedOperations extends Vue {
   @Prop({ required: true }) private bundle: ISignedBundle;
+  @Prop({ required: true }) private txId: string;
+
   get columns() {
     return [
       {
@@ -119,9 +121,9 @@ export default class CoeusSignedOperations extends Vue {
     return rows;
   }
 
-  private onDataClick(domain: string) {
-    const url = `${CoeusAPI.getBaseUrl()}/resolve/${domain}`;
-    window.open(url,'_blank');
+  private async onDataClick(domain: string) {
+    const data = await CoeusAPI.getTxDomainData(domain, this.txId);
+    console.log("Data as returned by click", data)
   }
 }
 </script>
