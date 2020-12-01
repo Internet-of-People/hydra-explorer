@@ -285,7 +285,7 @@ export default {
       TITLE: "DNS Browser",
       SEARCH: {
         DESCRIPTION: "Here, you can search for domains that are registered in IOP DNS.",
-        DOMAIN_INPUT: "A domain, eg.: .schema.company.secuirty.protocol",
+        DOMAIN_INPUT: "A domain, eg.: .schema.company.security.protocol",
         SEARCH_BUTTON: "Search",
         DOMAIN_NOT_FOUND: "The domain you were looking for cannot be found."
       },
