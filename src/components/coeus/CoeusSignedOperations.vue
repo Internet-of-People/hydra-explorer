@@ -23,7 +23,7 @@
                 <tr class="donttransform">
                   <td class="border px-4 py-2">Data</td>
                   <td class="border px-4 py-2">
-                    <button class="ml-0 p-2 button-lg text-xs" @click="onDataClick(data.row.domain)">Open</button>
+                    <button class="ml-0 p-2 button-lg text-xs" @click="onDataClick(data.row.operationIndex)">Open</button>
                   </td>
                 </tr>
               </tbody>
@@ -35,7 +35,7 @@
                 <tr>
                   <td class="border px-4 py-2">Data</td>
                   <td class="border px-4 py-2">
-                    <button class="ml-0 p-2 button-lg text-xs" @click="onDataClick(data.row.domain)">Open</button>
+                    <button class="ml-0 p-2 button-lg text-xs" @click="onDataClick(data.row.operationIndex)">Open</button>
                   </td>
                 </tr>
               </tbody>
@@ -70,13 +70,14 @@
   </section>
 </template>
 <script lang="ts">
-import { CoeusAPI } from '@/iop/coeus-api';
-import { ISignedBundle } from '@/iop/interfaces';
+import { CoeusAPI } from '../../iop/coeus-api';
+import { ISignedBundle } from '../../iop/interfaces';
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class CoeusSignedOperations extends Vue {
   @Prop({ required: true }) private bundle: ISignedBundle;
+  @Prop({ required: true }) private bundleIndex: string;
   @Prop({ required: true }) private txId: string;
 
   get columns() {
@@ -110,20 +111,22 @@ export default class CoeusSignedOperations extends Vue {
 
   get rows() {
     const rows = [];
+    const operations = this.bundle.operations;
 
-    for(const operation of this.bundle.operations) {
+    for(const operation of operations) {
       rows.push({
         domain: `${operation.name}`,
         operation: operation.type,
         _op: operation,
+        operationIndex: operations.indexOf(operation),
       });
     }
     return rows;
   }
 
-  private async onDataClick(domain: string) {
-    const data = await CoeusAPI.getTxDomainData(domain, this.txId);
-    console.log("Data as returned by click", data)
+  private onDataClick(opIndex: number) {
+    const operationIndex = opIndex.toString();
+    this.$router.push({ name: 'coeus-data', params: { txId: this.txId, bundleIndex: this.bundleIndex, operationIndex}});
   }
 }
 </script>

@@ -10,6 +10,7 @@ import {
   IUserOperation,
 } from './interfaces';
 import { buildTxStatusesMap } from './utils';
+import { ITransaction } from "../interfaces";
 
 export class CoeusAPI {
   public static async getDomainData(domain: string): Promise<ICoeusDomainData | null> {
@@ -17,7 +18,6 @@ export class CoeusAPI {
     if(resp.status === 404) {
       return null;
     }
-
     return resp.data;
   }
 
@@ -26,7 +26,6 @@ export class CoeusAPI {
     if(resp.status === 404) {
       return null;
     }
-
     return resp.data;
   }
 
@@ -37,24 +36,15 @@ export class CoeusAPI {
     }
   }
 
-  public static async getTxDomainData(domain: string, tx: string): Promise<unknown> | null {
-    const resp = await axios.get(`${this.getServerUrl()}/transactions/${tx}`);
-    if (resp.status === 404) {
-      return null;
-    }
-    const { bundles } = resp.data.data.asset as unknown as ICoeusAsset;
-    for (let bundle of bundles) {
-      for (let operation of bundle.operations) {
-        if ( operation.name === domain ) {
-          if ( this.isDataOperation(operation) ) {
-            return operation.data;
-          }
-        }
-      }
+  public static getOperationFromTx(tx: ITransaction, bundleIndex: number, operationIndex: number): IDataOperation | null {
+    const { bundles } = tx.asset as unknown as ICoeusAsset;
+    const operation = bundles[bundleIndex].operations[operationIndex];
+    if (this.isDataOperation(operation)) {
+      return operation as IDataOperation;
     }
     return null;
   }
-
+ 
   public static async getTxStatus(txs: string[]): Promise<Map<string,TxStatus>> {
     const promises = [];
     for(const tx of txs) {
@@ -65,15 +55,11 @@ export class CoeusAPI {
     return buildTxStatusesMap(txs, result);
   }
 
-  public static getServerUrl(): string {
-    return store.getters["network/server"];
-  }
-
   public static getBaseUrl(): string {
-    return this.getServerUrl().replace("/api/v2","/coeus/v1");
+    return store.getters["network/server"].replace("/api/v2","/coeus/v1");
   }
 
-  private static isDataOperation(operation: IUserOperation): operation is IDataOperation {
+  private static isDataOperation(operation: IUserOperation): boolean {
     return (operation.type ===  'register' || operation.type === 'update');
   };
 }

@@ -2,7 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import { Route, RouterMode } from "vue-router";
 import { Position, PositionResult } from "vue-router/types/router";
-import store from "@/store";
+import store from "../store";
 import NProgress from "nprogress";
 
 // route level code-splitting
@@ -27,6 +27,7 @@ const BridgechainsComponent = () => import(/* webpackChunkName: "bridgechains" *
 const AdvancedSearchComponent = () => import(/* webpackChunkName: "search" */ "@/pages/AdvancedSearch.vue");
 const DidBrowserComponent = () => import(/* webpackChunkName: "morpheus-browser" */ "@/pages/DidBrowser.vue");
 const DNSBrowserComponent = () => import(/* webpackChunkName: "coeus-browser" */ "@/pages/DNSBrowser.vue");
+const CoeusDataComponent = () => import(/* webpackChunkName: "coeus-data" */ "@/pages/CoeusData.vue");
 const DelegateComponent = () => import(/* webpackChunkName: "delegates" */ "@/pages/Delegates.vue");
 const NotFoundComponent = () => import(/* webpackChunkName: "404" */ "@/pages/404.vue");
 
@@ -137,6 +138,13 @@ const router = new Router({
       name: "transaction",
       component: TransactionComponent,
       meta: { title: (route: Route) => getTitle("Transaction") },
+    },
+    {
+      path: "/transaction/:txId/:bundleIndex/:operationIndex",
+      name: "coeus-data",
+      component: CoeusDataComponent,
+      props: true,
+      meta: { title: (route: Route) => getTitle("Coeus Data") },
     },
     {
       path: "/transactions",

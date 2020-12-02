@@ -304,6 +304,12 @@ export default {
         NO_SUBDOMAINS: "No subdomains registered."
       }
     },
+    COEUS_DATA: {
+      TITLE: "Domain",
+      TX_DATA: "Data sent in at the time of the transaction:",
+      CURRENT_DATA: "Data currently tied to the domain:",
+      UNAVAILABLE_DATA: "The domain has no data tied to it at the current state."
+    },
     NOT_FOUND: {
       TITLE: "Ooops!",
       PAGE: "Sorry, page not found",

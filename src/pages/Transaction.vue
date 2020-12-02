@@ -46,17 +46,17 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
 /* tslint:disable:no-console */
-import { Component, Vue, Watch } from "vue-property-decorator";
-import { mapGetters } from "vuex";
-import { Route } from "vue-router";
-import { ISortParameters, ITransaction } from "@/interfaces";
-import NotFound from "@/components/utils/NotFound.vue";
-import TransactionDetails from "@/components/transaction/Details.vue";
-import MultiPaymentTransactions from "@/components/tables/MultiPaymentTransactions.vue";
-import TransactionService from "@/services/transaction";
-import { paginationLimit } from "@/constants";
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { mapGetters } from 'vuex';
+import { Route } from 'vue-router';
+import { ITransaction } from '../interfaces';
+import NotFound from '../components/utils/NotFound.vue';
+import TransactionDetails from '../components/transaction/Details.vue';
+import MultiPaymentTransactions from '../components/tables/MultiPaymentTransactions.vue';
+import TransactionService from '../services/transaction';
+import { paginationLimit } from '../constants';
 
 Component.registerHooks(["beforeRouteEnter", "beforeRouteUpdate"]);
 

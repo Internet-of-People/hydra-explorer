@@ -130,6 +130,7 @@
       :key="bundle.signature"
       v-for="bundle in coeusTxBundles"
       :bundle="bundle"
+      :bundleIndex="bundleIndex(bundle)"
     />
 
     <section class="page-section py-5 md:py-10 mb-5">
@@ -354,26 +355,26 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { BigNumber } from "@/utils/BigNumber";
-import { TranslateResult } from "vue-i18n";
-import { mapGetters } from "vuex";
-import { ITransaction } from "@/interfaces";
-import { CoreTransaction, MagistrateTransaction, TypeGroupTransaction } from "@/enums";
-import { CoeusSignedOperations } from "@/components/iop";
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { BigNumber } from '../../utils/BigNumber';
+import { TranslateResult } from 'vue-i18n';
+import { mapGetters } from 'vuex';
+import { ITransaction } from '../../interfaces';
+import { CoreTransaction, MagistrateTransaction, TypeGroupTransaction } from '../../enums';
+import { CoeusSignedOperations } from '../../components/coeus';
 import {
   LockService,
   TransactionService,
-} from "@/services";
+} from '../../services';
 import {
   formatMorpheusOperations,
   isMorpheusTransaction,
   isCoeusTransaction,
   isIOPTransaction,
   OperationDetails,
-} from "@/iop/utils";
-import { morpheusTxProvider, coeusTxProvider } from "@/iop/tx-status";
-import { ICoeusAsset, TxStatus } from '@/iop/interfaces';
+} from '../../iop/utils';
+import { morpheusTxProvider, coeusTxProvider } from '../../iop/tx-status';
+import { ICoeusAsset, ISignedBundle, TxStatus } from '../../iop/interfaces';
 
 @Component({
   computed: {
@@ -415,9 +416,6 @@ export default class TransactionDetails extends Vue {
     if(!isCoeusTransaction(this.transaction.type, this.transaction.typeGroup)) {
       return;
     }
-
-    console.log(this.coeusAsset.bundles);
-
     return this.coeusAsset.bundles;
   }
 
@@ -556,6 +554,10 @@ export default class TransactionDetails extends Vue {
     } else {
       this.timelockStatus = this.$t("TRANSACTION.TIMELOCK.UNKNOWN");
     }
+  }
+
+  private bundleIndex(bundle: ISignedBundle): string {
+    return this.coeusAsset.bundles.indexOf(bundle).toString();
   }
 }
 </script>

@@ -26,7 +26,6 @@ for (const argKey in args) {
   }
   argsPrint.push(`${argKey}: '${argValue || "-"}'`);
 }
-console.log(`Will use the arguments: ${argsPrint.join(", ")}`);
 
 // Set proper ENV variables
 process.env["VUE_APP_EXPLORER_CONFIG"] = args.network;

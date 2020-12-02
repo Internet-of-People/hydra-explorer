@@ -1,5 +1,5 @@
 import { ForgingStatus } from "./enums";
-import { BigNumber } from "@/utils";
+import { BigNumber } from "./utils";
 
 export interface IBlock {
   id: string;
