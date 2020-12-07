@@ -2,31 +2,40 @@
   <div class="max-w-2xl mx-auto my-5 text-lg">
     <ContentHeader>{{ $t('PAGES.COEUS_DATA.TITLE') }}: {{ this.domainName }}</ContentHeader>
 
-    <section class="page-section mb-5 py-5 md:py-10" v-if="txOperation">
+    <section class="page-section mb-5 py-5 md:py-5" v-if="txOperation">
       <div class="my-5 sm:mx-10">
-        {{ $t('PAGES.COEUS_DATA.TX_DATA') }}
+        <div class="text-xl">{{ $t('PAGES.COEUS_DATA.TX_DATA') }}</div>
+        <hr class="mt-5 mb-5 w-full">
         <div class="w-full justify-between mt-5">
-          <div class="mb-4 lg:mb-0">
+          <div class="lg:mb-0 text-theme-text-tertiary">
             <DomainData
               class="mt-5"
               :data="txOperation.data"
             />
           </div>
         </div>
+        <hr class="mt-5 mb-5 w-full">
       </div>
     </section>
 
-    <section class="page-section mb-5 py-5 md:py-10" v-if="currentData">
-      <div class="mx-5 sm:mx-10">
-        {{ $t('PAGES.COEUS_DATA.CURRENT_DATA') }}
-        <div class="w-full justify-between mt-5">
-          <div class="mb-4 lg:mb-0">
-            <DomainData
-              class="mt-5"
-              :data="currentData"
-            />
-          </div>
+    <section class="page-section mb-5 py-5 md:py-5">
+      <div class="my-5 sm:mx-10">
+        <div class="text-xl">{{ $t('PAGES.COEUS_DATA.CURRENT_DATA') }}</div>
+        <hr class="mt-5 mb-5 w-full">
+        <div v-if="domainExpired" class="text-theme-text-tertiary">
+          <pre>Domain has already been expired.</pre>
         </div>
+        <template v-else>
+          <div class="w-full justify-between mt-5">
+            <div class="lg:mb-0">
+              <DomainData
+                class="mt-5"
+                :data="currentData"
+              />
+            </div>
+          </div>
+          <hr class="mt-5 w-full">
+        </template>
       </div>
     </section>
 
@@ -59,8 +68,9 @@ export default class CoeusData extends Vue {
   private currentData: unknown = null;
   private domainName: string;
 
-  private errorPresent: boolean = false;
+  private errorPresent = false;
   private errorMessage: string;
+  private domainExpired = false;
 
   public async mounted(): Promise<void> {
     try {
@@ -70,7 +80,7 @@ export default class CoeusData extends Vue {
       this.currentData = await CoeusAPI.getDomainData(this.domainName);
       
       if (this.currentData === null) { 
-        throw Error('Domain data not found in current state of the blockchain!');
+        this.domainExpired = true;
       }
     } catch(e) {
       this.errorPresent = true;

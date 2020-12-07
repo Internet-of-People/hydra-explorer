@@ -1,7 +1,9 @@
 <template>
-  <section class="page-section py-5 px-5 md:px-10 mb-5">
-    <div class="text-lg my-5 wrap-all">{{ data }}</div>
-  </section>
+    <div class="text-sm my-5 wrap-all">
+<pre>
+{{ JSON.stringify(data, undefined, 2) }}
+</pre>
+    </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
