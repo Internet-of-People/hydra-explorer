@@ -202,9 +202,8 @@ Component.registerHooks(["beforeRouteEnter"]);
   },
 })
 export default class MorpheusBrowserPage extends Vue {
-  private currentPage = 1;
   private did = '';
-  private atHeight;
+  private atHeight: number;
   private didDocument: IDidDocumentData = null;
   private operationAttempts: DidOperation[] = null;
   private tabActive = 'keys';
@@ -214,17 +213,20 @@ export default class MorpheusBrowserPage extends Vue {
     if(!this.didDocument) {
       return [];
     }
-
     const rights = [];
 
     for(const right of ALL_RIGHTS) {
       const rightHistories: IKeyRightHistory[] = this.didDocument.rights[right];
+
       for(const history of rightHistories) {
-        rights.push({
-          right,
-          keyLink: history.keyLink,
-          valid: history.valid,
-        });
+        const keyIndex = history.keyLink.slice(1);
+        if (this.didDocument.keys[keyIndex].valid) {
+          rights.push({
+            right,
+            keyLink: history.keyLink,
+            valid: history.valid,
+          });
+        }
       }
     }
     
@@ -235,13 +237,14 @@ export default class MorpheusBrowserPage extends Vue {
     if(!this.didDocument) {
       return [];
     }
-
     const keys = [];
+
     for(const key of this.didDocument.keys) {
       const keyRights = [];
 
       for(const right of ALL_RIGHTS) {
         const rightHistories: IKeyRightHistory[] = this.didDocument.rights[right];
+
         for(const history of rightHistories) {
           if(
             history.keyLink.startsWith('#') && 
@@ -262,7 +265,6 @@ export default class MorpheusBrowserPage extends Vue {
         rights: keyRights
       });
     }
-    
     return keys;
   }
 
