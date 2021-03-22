@@ -115,10 +115,10 @@
             </ul>
           </div>
           <div v-if="data.column.field === 'validFromHeight'">
-            {{ showNullableText(data.row.validFromHeight) }}
+            {{ showDashIfNull(data.row.validFromHeight) }}
           </div>
           <div v-if="data.column.field === 'validUntilHeight'">
-            {{ showNullableText(data.row.validUntilHeight) }}
+            {{ showDashIfNull(data.row.validUntilHeight) }}
           </div>
           <div v-if="data.column.field === 'valid'">
             <strong>
@@ -398,8 +398,8 @@ export default class MorpheusBrowserPage extends Vue {
     }
   }
 
-  private showNullableText(text: string|null) {
-    return text ? text : '-';
+  private showDashIfNull(number: number|null) {
+    return (number == null) ? '-' : number;
   }
 
   private setActiveTab(active: string) {
