@@ -1,6 +1,6 @@
 {
   "title": "DHYD Explorer",
-  "server": "https://dev.hydra.iop.global:4705/api/v2",
+  "server": "https://dev.explorer.hydraledger.io:4705/api/v2",
   "alias": "Development",
   "activeDelegates": 53,
   "rewardOffset": 50400,
