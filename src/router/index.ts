@@ -38,7 +38,7 @@ function getTitle(title: string): string {
 }
 
 const router = new Router({
-  mode: process.env.VUE_APP_ROUTER_MODE as RouterMode,
+  mode: 'history',
   routes: [
     {
       path: "/",
