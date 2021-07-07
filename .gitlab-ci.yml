@@ -2,6 +2,23 @@ stages:
   - build
   - docker
 
+build_local:
+  stage: build
+  image: node:12
+  only:
+    - develop
+  before_script:
+    - rm -rf dist
+  script:
+    - yarn --frozen-lockfile
+    - yarn build:local
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+      - dist/
+
 build_testnet:
   stage: build
   image: node:12
@@ -52,6 +69,20 @@ build_mainnet:
   artifacts:
     paths:
       - dist/
+
+build_docker_local:
+  stage: docker
+  image: docker:stable
+  only:
+    - develop
+  before_script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo $CI_REGISTRY
+    - echo $CI_REGISTRY_IMAGE
+    - docker build -f docker/DockerFile -t $CI_REGISTRY_IMAGE:latest-local .
+    - docker push $CI_REGISTRY_IMAGE:latest-local
 
 build_docker_testnet:
   stage: docker
